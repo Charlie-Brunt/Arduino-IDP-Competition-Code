@@ -1,6 +1,7 @@
 {
     "port": "COM5",
-    "board": "arduino:avr:uno",
+    "board": "arduino:megaavr:uno2018",
     "programmer": "arduino:avrispmkii",
-    "sketch": "test2.ino"
+    "sketch": "test2.ino",
+    "configuration": "mode=on"
 }

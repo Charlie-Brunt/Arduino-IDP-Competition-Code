@@ -3,7 +3,7 @@
     "configurations": [
         {
             "name": "Arduino",
-            "compilerPath": "C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\bin\\avr-g++",
+            "compilerPath": "C:\\Users\\cbrun\\AppData\\Local\\Arduino15\\packages\\arduino\\tools\\avr-gcc\\7.3.0-atmel3.6.1-arduino5\\bin\\avr-g++",
             "compilerArgs": [
                 "-std=gnu++11",
                 "-fpermissive",
@@ -15,24 +15,28 @@
             ],
             "intelliSenseMode": "gcc-x64",
             "includePath": [
-                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino",
-                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\variants\\standard",
-                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\libraries\\Wire\\src",
+                "C:\\Users\\cbrun\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\megaavr\\1.8.7\\cores\\arduino\\api\\deprecated",
+                "C:\\Users\\cbrun\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\megaavr\\1.8.7\\cores\\arduino",
+                "C:\\Users\\cbrun\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\megaavr\\1.8.7\\variants\\uno2018",
+                "C:\\Users\\cbrun\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\megaavr\\1.8.7\\libraries\\Wire\\src",
                 "C:\\Users\\cbrun\\OneDrive\\Documents - Laptop\\Arduino\\libraries\\Adafruit_Motor_Shield_V2_Library",
-                "c:\\program files (x86)\\arduino\\hardware\\tools\\avr\\lib\\gcc\\avr\\7.3.0\\include",
-                "c:\\program files (x86)\\arduino\\hardware\\tools\\avr\\lib\\gcc\\avr\\7.3.0\\include-fixed",
-                "c:\\program files (x86)\\arduino\\hardware\\tools\\avr\\avr\\include"
+                "C:\\Program Files (x86)\\Arduino\\libraries\\Servo\\src",
+                "c:\\users\\cbrun\\appdata\\local\\arduino15\\packages\\arduino\\tools\\avr-gcc\\7.3.0-atmel3.6.1-arduino5\\lib\\gcc\\avr\\7.3.0\\include",
+                "c:\\users\\cbrun\\appdata\\local\\arduino15\\packages\\arduino\\tools\\avr-gcc\\7.3.0-atmel3.6.1-arduino5\\lib\\gcc\\avr\\7.3.0\\include-fixed",
+                "c:\\users\\cbrun\\appdata\\local\\arduino15\\packages\\arduino\\tools\\avr-gcc\\7.3.0-atmel3.6.1-arduino5\\avr\\include"
             ],
             "forcedInclude": [
-                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
+                "C:\\Users\\cbrun\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\megaavr\\1.8.7\\cores\\arduino\\Arduino.h"
             ],
             "cStandard": "c11",
             "cppStandard": "c++11",
             "defines": [
                 "F_CPU=16000000L",
                 "ARDUINO=10819",
-                "ARDUINO_AVR_UNO",
-                "ARDUINO_ARCH_AVR",
+                "ARDUINO_AVR_UNO_WIFI_REV2",
+                "ARDUINO_ARCH_MEGAAVR",
+                "UNO_WIFI_REV2_328MODE",
+                "MILLIS_USE_TIMERB3",
                 "__DBL_MIN_EXP__=(-125)",
                 "__HQ_FBIT__=15",
                 "__cpp_attributes=200809",

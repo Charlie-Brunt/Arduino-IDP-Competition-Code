@@ -2,6 +2,6 @@
     "port": "COM5",
     "board": "arduino:megaavr:uno2018",
     "programmer": "arduino:avrispmkii",
-    "sketch": "test2.ino",
+    "sketch": "testMotors.ino",
     "configuration": "mode=on"
 }

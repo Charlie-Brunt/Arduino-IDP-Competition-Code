@@ -11,42 +11,42 @@ void setup() {
 void loop(){
   
 }
-void forwards(speed) {
+void forwards(int speed) {
     motor1 -> setSpeed(speed);
     motor2 -> setSpeed(speed);
     motor1 -> run(FORWARD);
     motor2 -> run(FORWARD);
 }
 
-void backwards(speed) {
+void backwards(int speed) {
     motor1 -> setSpeed(speed);
     motor2 -> setSpeed(speed);
     motor1 -> run(BACKWARD);
     motor2 -> run(BACKWARD);
 }
 
-void turn_right(speed_high,speed_low) {
+void turn_right(int speed_high,int speed_low) {
     motor1 -> setSpeed(speed_high);
     motor2 -> setSpeed(speed_low);
     motor1 -> run(FORWARD);
     motor2 -> run(FORWARD);
 }
 
-void turn_left(speed_high,speed_low) {
+void turn_left(int speed_high,int speed_low) {
     motor1 -> setSpeed(speed_low);
     motor2 -> setSpeed(speed_high);
     motor1 -> run(FORWARD);
     motor2 -> run(FORWARD);
 }
 
-void rotate_right(speed) {
+void rotate_right(int speed) {
     motor1 -> setSpeed(speed);
     motor2 -> setSpeed(speed);
     motor1 -> run(FORWARD);
     motor2 -> run(BACKWARD);
 }
 
-void rotate_left(speed) {
+void rotate_left(int speed) {
     motor1 -> setSpeed(speed);
     motor2 -> setSpeed(speed);
     motor1 -> run(BACKWARD);

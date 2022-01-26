@@ -9,20 +9,20 @@ Adafruit_DCMotor *motor2 = AFMS.getMotor(2);
 const int motionLEDpin = 13;
 const int lineFollow1 = 4;
 const int lineFollow2 = 5;
-const int junctionCounter = 0;
+int junctionCounter = 0;
 
 const float motorSpeed = 255; // Adjust motor speed here
 const int turningRate = 0; // Potential for turning rate adjustment?
-const int previousState = 1; // Previous line following state
+int previousState = 1; // Previous line following state
 
 // function definitions
-// void forwards(int motorspeed);
-// void stop();
-// void turn_right();
-// void turn_left();
-// void rotate_left();
-// void rotate_right();
-// void
+void forwards();
+void stop();
+void turn_right();
+void turn_left();
+void rotate_left();
+void rotate_right();
+
 
 void setup() {
     AFMS.begin();
@@ -39,13 +39,16 @@ void loop() {
     if ((lineFollow1 == LOW) && (lineFollow2 == LOW)) {
         forwards(motorSpeed); // STATE 1
         previousState = 1;
-    } else if ((lineFollow1 == LOW) && (lineFollow2 == HIGH)) {
+    } 
+    else if ((lineFollow1 == LOW) && (lineFollow2 == HIGH)) {
         turn_right(motorSpeed, motorSpeed/2);
         previousState = 2;
-    } else if ((lineFollow1 == HIGH) && (lineFollow2 == LOW)) {
+    } 
+    else if ((lineFollow1 == HIGH) && (lineFollow2 == LOW)) {
         turn_left(motorSpeed, motorSpeed/2);
         previousState = 3;
-    } else if ((lineFollow1 == HIGH) && (lineFollow2 == HIGH)) {
+    } 
+    else if ((lineFollow1 == HIGH) && (lineFollow2 == HIGH)) {
         switch (junctionCounter)
         {
         case 0:
@@ -136,5 +139,5 @@ void stop() {
     motor1 -> setSpeed(0);
     motor2 -> setSpeed(0);
     motor1 -> run(RELEASE);
-    motor2 -> run(RELEASE)
+    motor2 -> run(RELEASE);
 }

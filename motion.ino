@@ -52,3 +52,8 @@ void rotate_left(int speed) {
     motor1 -> run(BACKWARD);
     motor2 -> run(FORWARD);
 }
+
+void stop() {
+    motor1 -> run(RELEASE);
+    motor2 -> run(RELEASE)
+}

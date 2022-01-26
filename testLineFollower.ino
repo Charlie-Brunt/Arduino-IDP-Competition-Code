@@ -15,21 +15,29 @@ const float motorSpeed = 255; // Adjust motor speed here
 const int turningRate = 0; // Potential for turning rate adjustment?
 const int previousState = 1; // Previous line following state
 
+// function definitions
+// void forwards(int motorspeed);
+// void stop();
+// void turn_right();
+// void turn_left();
+// void rotate_left();
+// void rotate_right();
+// void
 
-void setup {
+void setup() {
     AFMS.begin();
     pinMode(motionLEDpin, OUTPUT);
     pinMode(lineFollow1, INPUT);
-    pinmode(lineFollow2, INPUT);
+    pinMode(lineFollow2, INPUT);
     
     Serial.begin(9600);
     Serial.println("Ready!");
     delay(3000);
 }
 
-void loop {
+void loop() {
     if ((lineFollow1 == LOW) && (lineFollow2 == LOW)) {
-        forward(motorSpeed); // STATE 1
+        forwards(motorSpeed); // STATE 1
         previousState = 1;
     } else if ((lineFollow1 == LOW) && (lineFollow2 == HIGH)) {
         turn_right(motorSpeed, motorSpeed/2);
@@ -41,19 +49,19 @@ void loop {
         switch (junctionCounter)
         {
         case 0:
-            forward(motorSpeed);
+            forwards(motorSpeed);
             junctionCounter++;
             break;
         case 1:
             stop();
             delay(3000);
-            forward(motorSpeed);
+            forwards(motorSpeed);
             junctionCounter++;
             break;
         case 2:
             stop();
             delay(3000);
-            forward(motorSpeed);
+            forwards(motorSpeed);
             junctionCounter++;
             break;
         case 3:
@@ -61,7 +69,7 @@ void loop {
             rotate_left(motorSpeed);
             delay(2000); // adjust this so angle is 180
             stop();
-            forward(motorSpeed);
+            forwards(motorSpeed);
             break;
         case 4:
             junctionCounter++;
@@ -69,11 +77,11 @@ void loop {
         case 5:
             stop();
             delay(3000);
-            forward(motorSpeed);
+            forwards(motorSpeed);
             junctionCounter++;
             break;
         case 6:
-            forward(motorSpeed);
+            forwards(motorSpeed);
             delay(1000); // tune this so inside box
             stop();
             delay(1000000000);
@@ -125,6 +133,8 @@ void rotate_left(int speed) {
 }
 
 void stop() {
+    motor1 -> setSpeed(0);
+    motor2 -> setSpeed(0);
     motor1 -> run(RELEASE);
     motor2 -> run(RELEASE)
 }

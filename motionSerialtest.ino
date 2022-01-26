@@ -7,8 +7,8 @@ Adafruit_DCMotor *motor1 = AFMS.getMotor(1);
 Adafruit_DCMotor *motor2 = AFMS.getMotor(2);
 
 const int motionLEDpin = 13;
-const int lineFollow1 = 4;
-const int lineFollow2 = 5;
+const int lineSensor1 = 4;
+const int lineSensor2 = 5;
 int junctionCounter = 0;
 String input;
 const float motorSpeed = 255; // Adjust motor speed here
@@ -27,8 +27,8 @@ void rotate_right();
 void setup() {
     AFMS.begin();
     pinMode(motionLEDpin, OUTPUT);
-    pinMode(lineFollow1, INPUT);
-    pinMode(lineFollow2, INPUT);
+    pinMode(lineSensor1, INPUT);
+    pinMode(lineSensor2, INPUT);
     
     Serial.begin(9600);
     Serial.println("Ready!");

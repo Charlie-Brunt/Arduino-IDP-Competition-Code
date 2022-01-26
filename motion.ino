@@ -6,9 +6,10 @@ Adafruit_DCMotor *motor1 = AFMS.getMotor(1);
 Adafruit_DCMotor *motor2 = AFMS.getMotor(2);
 
 void setup() {
- AFMS.begin();  // create with the default frequency 1.6KHz 
+    AFMS.begin();  // create with the default frequency 1.6KHz 
+}
 
-void loop(){
+void loop() {
   
 }
 void forwards(int speed) {
@@ -54,6 +55,8 @@ void rotate_left(int speed) {
 }
 
 void stop() {
+    motor1 -> setSpeed(0);
+    motor2 -> setSpeed(0);
     motor1 -> run(RELEASE);
-    motor2 -> run(RELEASE)
+    motor2 -> run(RELEASE);
 }

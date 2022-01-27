@@ -19,8 +19,10 @@ bool lfReverse = false;
 // function definitions
 void forwards();
 void stop();
-void turn_right();
-void turn_left();
+void turn_right_forwards();
+void turn_left_forwards();
+void turn_right_backwards();
+void turn_left_backwards();
 void rotate_left();
 void rotate_right();
 
@@ -72,10 +74,10 @@ void loop()
     else if ((LineSensor1 == LOW) && (LineSensor2 == HIGH))
     {   
         if(lfReverse == false){
-            turn_right(motorSpeed, motorSpeed / 4);
+            turn_right_forwards(motorSpeed, motorSpeed / 4);
             Serial.println("right"); 
         } else {
-            turn_left(motorSpeed, motorSpeed / 4);
+            turn_left_backwards(motorSpeed, motorSpeed / 4);
             Serial.println("left");
         }
         
@@ -83,10 +85,10 @@ void loop()
     else if ((LineSensor1 == HIGH) && (LineSensor2 == LOW))
     {
         if(lfReverse == false){
-            turn_left(motorSpeed, motorSpeed / 4);
+            turn_left_forwards(motorSpeed, motorSpeed / 4);
             Serial.println("left"); 
         } else {
-            turn_right(motorSpeed, motorSpeed / 4);
+            turn_right_backwards(motorSpeed, motorSpeed / 4);
             Serial.println("right");
         } 
     }
@@ -145,7 +147,7 @@ void backwards(int speed)
     motor2->run(BACKWARD);
 }
 
-void turn_right(int speed_high, int speed_low)
+void turn_right_forwards(int speed_high, int speed_low)
 {
     motor1->setSpeed(speed_high);
     motor2->setSpeed(speed_low);
@@ -153,12 +155,28 @@ void turn_right(int speed_high, int speed_low)
     motor2->run(FORWARD);
 }
 
-void turn_left(int speed_high, int speed_low)
+void turn_left_forwards(int speed_high, int speed_low)
 {
     motor1->setSpeed(speed_low);
     motor2->setSpeed(speed_high);
     motor1->run(FORWARD);
     motor2->run(FORWARD);
+}
+
+void turn_right_backwards(int speed_high, int speed_low)
+{
+    motor1->setSpeed(speed_high);
+    motor2->setSpeed(speed_low);
+    motor1->run(BACKWARD);
+    motor2->run(BACKWARD);
+}
+
+void turn_left_backwards(int speed_high, int speed_low)
+{
+    motor1->setSpeed(speed_low);
+    motor2->setSpeed(speed_high);
+    motor1->run(BACKWARD);
+    motor2->run(BACKWARD);
 }
 
 void rotate_right(int speed)

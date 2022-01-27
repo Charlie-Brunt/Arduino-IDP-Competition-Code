@@ -122,9 +122,6 @@ void loop()
             break;
         case 3:
             stop();
-            rotate_left(motorSpeed);
-            delay(duration/2);
-            stop();
             delay(1000000000);
             break;
         }
@@ -163,7 +160,7 @@ void turn_left_forwards(int speed_high, int speed_low)
     motor2->run(FORWARD);
 }
 
-void turn_right_backwards(int speed_high, int speed_low)
+void turn_left_backwards(int speed_high, int speed_low)
 {
     motor1->setSpeed(speed_high);
     motor2->setSpeed(speed_low);
@@ -171,7 +168,7 @@ void turn_right_backwards(int speed_high, int speed_low)
     motor2->run(BACKWARD);
 }
 
-void turn_left_backwards(int speed_high, int speed_low)
+void turn_right_backwards(int speed_high, int speed_low)
 {
     motor1->setSpeed(speed_low);
     motor2->setSpeed(speed_high);

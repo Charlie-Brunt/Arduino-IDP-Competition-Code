@@ -13,6 +13,8 @@ int junctionCounter = 0;
 
 const float motorSpeed = 255; // Adjust motor speed here
 const int turningRate = 0;    // Potential for turning rate adjustment?
+const int duration = 1000;
+bool lfReverse = false; 
 
 // function definitions
 void forwards();
@@ -59,64 +61,72 @@ void loop()
     // Line-following algorithm
     if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
     {
-        forwards(motorSpeed);
-        Serial.println("forwards");
+        if(lfReverse == false){
+            forwards(motorSpeed);
+            Serial.println("forwards"); 
+        } else {
+            backwards(motorSpeed);
+            Serial.println("backwards"); 
+        }
     }
     else if ((LineSensor1 == LOW) && (LineSensor2 == HIGH))
-    {
-        turn_right(motorSpeed, motorSPeed / 4);
-        Serial.println("right");
+    {   
+        if(lfReverse == false){
+            turn_right(motorSpeed, motorSpeed / 4);
+            Serial.println("right"); 
+        } else {
+            turn_left(motorSpeed, motorSpeed / 4);
+            Serial.println("left");
+        }
+        
     }
     else if ((LineSensor1 == HIGH) && (LineSensor2 == LOW))
     {
-        turn_left(motorSpeed, motorSPeed / 4);
-        Serial.println("left");
+        if(lfReverse == false){
+            turn_left(motorSpeed, motorSpeed / 4);
+            Serial.println("left"); 
+        } else {
+            turn_right(motorSpeed, motorSpeed / 4);
+            Serial.println("right");
+        } 
     }
-    // else if ((LineSensor1 == HIGH) && (LineSensor2 == HIGH))
-    // {
+    else if ((LineSensor1 == HIGH) && (LineSensor2 == HIGH))
+    {
 
-    //     switch (junctionCounter)
-    //     {
-    //     case 0:
-    //         forwards(motorSpeed);
-    //         junctionCounter++;
-    //         break;
-    //     case 1:
-    //         stop();
-    //         delay(3000);
-    //         forwards(motorSpeed);
-    //         junctionCounter++;
-    //         break;
-    //     case 2:
-    //         stop();
-    //         delay(3000);
-    //         forwards(motorSpeed);
-    //         junctionCounter++;
-    //         break;
-    //     case 3:
-    //         stop();
-    //         rotate_left(motorSpeed);
-    //         delay(2000); // adjust this so angle is 180
-    //         stop();
-    //         forwards(motorSpeed);
-    //         break;
-    //     case 4:
-    //         junctionCounter++;
-    //         break;
-    //     case 5:
-    //         stop();
-    //         delay(3000);
-    //         forwards(motorSpeed);
-    //         junctionCounter++;
-    //         break;
-    //     case 6:
-    //         forwards(motorSpeed);
-    //         delay(1000); // tune this so inside box
-    //         stop();
-    //         delay(1000000000);
-    //         break;
-    //     }
-    // }
+        switch (junctionCounter)
+        {
+        case 0:
+            forwards(motorSpeed);
+            junctionCounter++;
+            delay(1000);
+            break;
+        case 1:
+            forwards(motorSpeed);
+            junctionCounter++;
+            delay(1000);
+            break;
+        case 2:
+            stop();
+            lfReverse = true;
+            delay(3000);
+            backwards(motorSpeed);
+            delay(1000);
+            stop();
+            // rotate_right(motorSpeed);
+            // delay(duration);
+            // stop();
+            // forwards(motorSpeed);
+            junctionCounter++;
+            break;
+        case 3:
+            stop();
+            rotate_left(motorSpeed);
+            delay(duration/2);
+            stop();
+            delay(1000000000);
+            break;
+        }
+    }
 }
 
 void forwards(int speed)

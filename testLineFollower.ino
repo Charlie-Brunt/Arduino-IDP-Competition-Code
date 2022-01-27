@@ -64,12 +64,12 @@ void loop()
     }
     else if ((LineSensor1 == LOW) && (LineSensor2 == HIGH))
     {
-        turn_right(motorSpeed, motorSPeed / 4);
+        turn_right(motorSpeed, motorSpeed / 4);
         Serial.println("right");
     }
     else if ((LineSensor1 == HIGH) && (LineSensor2 == LOW))
     {
-        turn_left(motorSpeed, motorSPeed / 4);
+        turn_left(motorSpeed, motorSpeed / 4);
         Serial.println("left");
     }
     // else if ((LineSensor1 == HIGH) && (LineSensor2 == HIGH))

@@ -81,11 +81,7 @@ void loop()
     else{
         Serial.println("line follow");
         line_follow(LineSensor1,LineSensor2);
-    }
-
-    delay(1000);
-
-        
+    }        
 }
 
 

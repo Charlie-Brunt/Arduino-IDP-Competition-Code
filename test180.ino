@@ -24,6 +24,7 @@ void turn_right_forwards();
 void turn_left_forwards();
 void rotate_left();
 void rotate_right();
+void line_follow();
 
 void setup()
 {
@@ -43,7 +44,6 @@ void loop()
     int LineSensor1;
     //right sensor state
     int LineSensor2;
-
     //sets left LineSensor1 to high if on tape, else Low
     if(analogRead(leftIn)>=850){
         LineSensor1 = HIGH;
@@ -58,31 +58,32 @@ void loop()
     else {
         LineSensor2 = LOW;
     }  
-    if (IfRotate = true) {
+    if (IfRotate == true) {
+        Serial.println("rotate");
         if (Isoffline==false){
-            rotate_right(motorSpeed);
-            delay(1000);
+            rotate_right(motorSpeed/3);
+            delay(500);
             Isoffline = true;
+            Serial.println("offline");
         }
         else{
             if (LineSensor2==LOW){
                 rotate_right(motorSpeed);
+                
             }
             else if (LineSensor2==HIGH){
-                delay(500);
                 stop();
-                IfRotate=false
+                IfRotate=false;
             }
         }
 
     }
     else{
+        Serial.println("line follow");
         line_follow(LineSensor1,LineSensor2);
     }
-    
 
-
-
+    delay(1000);
 
         
 }
@@ -153,13 +154,14 @@ void line_follow(int LineSensor1,int LineSensor2)
     }
     else if ((LineSensor1 == LOW) && (LineSensor2 == HIGH))
     {
-        turn_right(motorSpeed, motorSpeed / 4);
+        turn_right_forwards(motorSpeed, motorSpeed / 4);
     }
     else if ((LineSensor1 == HIGH) && (LineSensor2 == LOW))
     {
-        turn_left(motorSpeed, motorSpeed / 4);
+        turn_left_forwards(motorSpeed, motorSpeed / 4);
     }
-    else if ((LineSensor1 == HIGH) && (LineSensor2 == LOW))){
+    else if ((LineSensor1 == HIGH) && (LineSensor2 == HIGH))
+    {
         stop();
         delay(2000);
         IfRotate = true;

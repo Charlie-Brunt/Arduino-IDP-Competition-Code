@@ -125,7 +125,7 @@ void backwards(int speed)
     motor2->run(BACKWARD);
 }
 
-void turn_left_backwards(int speed_high, int speed_low)
+void turn_right_backwards(int speed_high, int speed_low)
 {
     motor1->setSpeed(speed_high);
     motor2->setSpeed(speed_low);
@@ -133,7 +133,7 @@ void turn_left_backwards(int speed_high, int speed_low)
     motor2->run(BACKWARD);
 }
 
-void turn_right_backwards(int speed_high, int speed_low)
+void turn_left_backwards(int speed_high, int speed_low)
 {
     motor1->setSpeed(speed_low);
     motor2->setSpeed(speed_high);

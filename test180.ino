@@ -1,30 +1,32 @@
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
-#define leftIn A0
-#define rightIn A1
 
+// Pin assigments
+#define leftIn A0  // left IR sensor
+#define rightIn A1  // right IR sensor
+#define distanceSensorPin A2
+#define echoPin 2  // ultrasonic sensor I
+#define triggerPin 3  // ultrasonic sensor II
+#define courseLEDpin 1
+#define fineLEDpin 0
+#define pushButtonPin 7
+#define motionLEDpin 13
+
+// Motor setup
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *motor1 = AFMS.getMotor(1);
 Adafruit_DCMotor *motor2 = AFMS.getMotor(2);
 
-const int motionLEDpin = 13;
+// Flags, state variables
 int junctionCounter = 0;
-
-const float motorSpeed = 255; // Adjust motor speed here
-const int turningRate = 0;    // Potential for turning rate adjustment?
-const int duration = 1000;
 bool IfRotate = false; 
-bool Isoffline = false;
+bool IsOffLine = false;
 
-// function definitions
-void forwards();
-void stop();
-void turn_right_forwards();
-void turn_left_forwards();
-void rotate_left();
-void rotate_right();
-void line_follow();
+//Parameters
+const float motorSpeed = 255; // Adjust motor speed here
+const int duration = 1000;
+
 
 void setup()
 {
@@ -38,6 +40,8 @@ void setup()
     delay(3000);
 }
 
+
+/******************************** MAIN PROGRAM ********************************/
 void loop()
 {
     //left sensor state
@@ -60,10 +64,10 @@ void loop()
     }  
     if (IfRotate == true) {
         Serial.println("rotate");
-        if (Isoffline==false){
+        if (IsOffLine==false){
             rotate_right(motorSpeed/3);
             delay(500);
-            Isoffline = true;
+            IsOffLine = true;
             Serial.println("offline");
         }
         else{
@@ -84,7 +88,7 @@ void loop()
     }        
 }
 
-
+/******************************** MOVEMENT FUNCTIONS ********************************/
 void forwards(int speed)
 {
     motor1->setSpeed(speed);
@@ -117,7 +121,6 @@ void turn_left_forwards(int speed_high, int speed_low)
     motor2->run(FORWARD);
 }
 
-
 void rotate_right(int speed)
 {
     motor1->setSpeed(speed);
@@ -142,6 +145,7 @@ void stop()
     motor2->run(RELEASE);
 }
 
+/******************************** LINE FOLLOWING ALGORITHM ********************************/
 void line_follow(int LineSensor1,int LineSensor2)
 {
     if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
@@ -162,5 +166,4 @@ void line_follow(int LineSensor1,int LineSensor2)
         delay(2000);
         IfRotate = true;
     }
-
 }

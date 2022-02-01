@@ -26,7 +26,7 @@ bool Ifdeliver = false;
 
 //Parameters
 const float motorSpeed = 255; // Adjust motor speed here
-const int duration_90degree = 4000; 
+const int duration_90degree = 6000; 
 const int duration_delivery = 3000;
 
 

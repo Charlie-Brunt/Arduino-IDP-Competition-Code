@@ -1,6 +1,11 @@
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
+#include <ezButton.h>
+
+// for push button
+#define LOOP_STATE_STOPPED 0
+#define LOOP_STATE_STARTED 1
 
 // Pin assigments
 #define leftIn A0  // left IR sensor
@@ -50,6 +55,8 @@ void setup()
     pinMode(leftIn, INPUT);
     pinMode(rightIn, INPUT);
 
+    button.setDebounceTime(20); // set debounce time to 50 milliseconds
+
     Serial.begin(9600);
     Serial.println("Ready!");
     delay(3000);
@@ -58,35 +65,47 @@ void setup()
 
 /******************************** MAIN PROGRAM ********************************/
 void loop()
-{   //left sensor state
-    int LineSensor1;
-    //right sensor state
-    int LineSensor2;
-    //sets left LineSensor1 to high if on tape, else Low
-    if(analogRead(leftIn)>=850){
-        LineSensor1 = HIGH;
-    }
-    else {
-        LineSensor1 = LOW;
-    }
-    //sets right LineSensor2 to high if on tape, else Low
-    if(analogRead(rightIn)>=850){
-        LineSensor2 = HIGH;
-    }
-    else {
-        LineSensor2 = LOW;
+{   
+    button.loop(); // MUST call the loop() function first
+
+    if (button.isPressed()) {
+        if (loopState == LOOP_STATE_STOPPED)
+            loopState = LOOP_STATE_STARTED;
+        else // if(loopState == LOOP_STATE_STARTED)
+            loopState = LOOP_STATE_STOPPED;
     }
 
+    if (loopState == LOOP_STATE_STARTED) {
+        //left sensor state
+        int LineSensor1;
+        //right sensor state
+        int LineSensor2;
+        //sets left LineSensor1 to high if on tape, else Low
+        if(analogRead(leftIn)>=850){
+            LineSensor1 = HIGH;
+        }
+        else {
+            LineSensor1 = LOW;
+        }
+        //sets right LineSensor2 to high if on tape, else Low
+        if(analogRead(rightIn)>=850){
+            LineSensor2 = HIGH;
+        }
+        else {
+            LineSensor2 = LOW;
+        }
 
-    if (Ifdeliver == true) {
-        red_box()
-    }
-    else if (IfRotate == true) {
-        rotate180();
-        } 
-    else {
-        line_follow(LineSensor1,LineSensor2);
-    }
+
+        if (Ifdeliver == true) {
+            red_box()
+        }
+        else if (IfRotate == true) {
+            rotate180();
+            } 
+        else {
+            line_follow(LineSensor1,LineSensor2);
+        }
+    }  
     
 }
 

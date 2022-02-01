@@ -7,15 +7,14 @@ To do:
 - [x] Motion commands with serial control
 - [x] Line following algorithm
 - [x] Perfect 180s
-- [ ] Push button / serial command + time delay to start program
+- [x] Push button / serial command + time delay to start program
+- [x] Three journey test protocol
+- [x] Switch-case structure
 - [ ] Call functions from .cpp and .h files
 - [ ] Write block detection code
 - [ ] Write block identification code
 - [ ] Write servo actuation code
-- [ ] Write first pass program including block detection, identification and collection
 - [ ] Introduce decision-based LED signals and movement LED
-- [ ] Write second pass code (similar to first pass)
 - [ ] Write third pass search, store, fetch algorithm
-- [ ] Switch-case structure?
 
 By Amanda Ge and Charlie Brunt

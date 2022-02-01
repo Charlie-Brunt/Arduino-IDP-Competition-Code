@@ -20,6 +20,19 @@ Adafruit_DCMotor *motor2 = AFMS.getMotor(2);
 
 // Flags, state variables
 int junctionCounter = 0;
+#define startJunction 0  // for passing out of start box
+#define junction1 1  // for when passing deliver junction on outwards journey
+#define junction2 2  // for second junction
+#define junction3 3  // for when reaching end search zone
+#define deliverJunction 4  // for when delivering at deliver junction
+#define endJunction 5  // for passing into start box
+
+int journeyCounter = 1;
+#define journey1 1
+#define journey2 2
+#define journey3 3
+
+bool fineBlock = false;
 bool IfRotate = false; 
 bool IsOffLine = false;
 bool Ifdeliver = false;
@@ -62,13 +75,19 @@ void loop()
     }
     else {
         LineSensor2 = LOW;
-    }  
+    }
+
+
     if (Ifdeliver == true) {
         red_box()
     }
-    else{
+    else if (IfRotate == true) {
+        rotate180();
+        } 
+    else {
         line_follow(LineSensor1,LineSensor2);
-    }        
+    }
+    
 }
 
 /******************************** MOVEMENT FUNCTIONS ********************************/
@@ -127,6 +146,26 @@ void stop()
     motor1->run(RELEASE);
     motor2->run(RELEASE);
 }
+/******************************** 180 TURN ********************************/
+void rotate180(int LineSensor1, int LineSensor2) 
+{
+    if (IsOffLine==false){
+            rotate_right(motorSpeed/3);
+            delay(500);
+            IsOffLine = true;
+        }
+        else{
+            if (LineSensor2==LOW){
+                rotate_right(motorSpeed);
+                
+            }
+            else if (LineSensor2==HIGH){
+                stop();
+                IfRotate=false;
+            }
+}
+
+
 
 /******************************** LINE FOLLOWING ALGORITHM ********************************/
 void line_follow(int LineSensor1,int LineSensor2)
@@ -145,9 +184,7 @@ void line_follow(int LineSensor1,int LineSensor2)
     }
     else if ((LineSensor1 == HIGH) && (LineSensor2 == HIGH))
     {
-        stop();
-        delay(2000);
-        Ifdeliver = true;
+        journeyLogic();
     }
 }
 
@@ -184,3 +221,83 @@ void blue_box()
     Ifdeliver = false;
 }
 
+/*********************** JOURNEY LOGIC ***********************/
+
+void journeyLogic()
+{
+    switch (journeyCounter)
+        {
+        case journey1:
+
+            switch (junctionCounter)
+            {
+            case startJunction:
+                forwards(motorSpeed);
+                junctionCounter++;
+                delay(1000);
+                break;
+            case junction1:
+                forwards(motorSpeed);
+                junctionCounter++;
+                delay(1000);
+                break;
+            case junction2:
+                stop();
+                delay(2000);
+                junctionCounter = deliverJunction;
+                IfRotate = true;
+                break;
+            case deliverJunction:
+                stop();
+                delay(2000);
+                Ifdeliver = true;
+                junctionCounter = junction2;
+                journeyCounter++;
+                break;
+            }            
+        
+        case journey2:
+
+            switch (junctionCounter)
+            {
+            case junction2:
+                forwards(motorSpeed);
+                delay(3000);
+                stop();  // simulate detection of 2nd block
+                delay(2000);
+                junctionCounter++;                
+                ifRotate = true;
+                break;
+            case deliverJunction:
+                stop();
+                delay(2000);
+                Ifdeliver = true;
+                junctionCounter = junction2;
+                journeyCounter++;
+                break;
+            }
+
+        case journey3:
+
+            switch (junctionCounter)
+            {
+            case junction2:
+                forwards(motorSpeed);
+                junctionCounter++;
+                delay(1000);
+                break;
+            case junction3:
+                stop();
+                delay(2000);
+                junctionCounter = deliverJunction;
+                IfRotate = true;
+                break;
+            case deliverJunction:
+                stop();
+                delay(2000);
+                Ifdeliver = true;
+                delay(1000000);
+                break;
+            }
+        }
+}

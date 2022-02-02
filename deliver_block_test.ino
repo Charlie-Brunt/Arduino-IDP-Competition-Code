@@ -3,17 +3,13 @@
 #include "utility/Adafruit_MS_PWMServoDriver.h"
 #include <ezButton.h>
 
-// for push button
-#define LOOP_STATE_STOPPED 0
-#define LOOP_STATE_STARTED 1
-
-// Pin assigments
+// Pin assignments
 #define leftIn A0  // left IR sensor
-#define rightIn A1  // right IR sensor
+#define rightIn A1 // right IR sensor
 #define distanceSensorPin A2
-#define echoPin 2  // ultrasonic sensor I
-#define triggerPin 3  // ultrasonic sensor II
-#define courseLEDpin 1
+#define echoPin 2    // ultrasonic sensor I
+#define triggerPin 3 // ultrasonic sensor II
+#define coarseLEDpin 1
 #define fineLEDpin 0
 #define pushButtonPin 7
 #define motionLEDpin 13
@@ -23,30 +19,35 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *motor1 = AFMS.getMotor(1);
 Adafruit_DCMotor *motor2 = AFMS.getMotor(2);
 
+// Push button setup
+#define LOOP_STATE_STOPPED 0
+#define LOOP_STATE_STARTED 1
+ezButton button(pushButtonPin);  // create ezButton object that attach to pin 7;
+int loopState = LOOP_STATE_STOPPED;
+
 // Flags, state variables
 int junctionCounter = 0;
-#define startJunction 0  // for passing out of start box
-#define junction1 1  // for when passing deliver junction on outwards journey
-#define junction2 2  // for second junction
-#define junction3 3  // for when reaching end search zone
-#define deliverJunction 4  // for when delivering at deliver junction
-#define endJunction 5  // for passing into start box
+#define startJunction 0   // for passing out of start box
+#define junction1 1       // for when passing deliver junction on outwards journey
+#define junction2 2       // for second junction
+#define junction3 3       // for when reaching end search zone
+#define deliverJunction 4 // for when delivering at deliver junction
+#define endJunction 5     // for passing into start box
 
 int journeyCounter = 1;
 #define journey1 1
 #define journey2 2
 #define journey3 3
 
-bool fineBlock = false;
-bool IfRotate = false; 
+bool IfCoarse = false;
+bool IfRotate = false;
 bool IsOffLine = false;
 bool Ifdeliver = false;
 
 //Parameters
 const float motorSpeed = 255; // Adjust motor speed here
-const int duration_90degree = 6000; 
+const int duration_90degree = 6000;
 const int duration_delivery = 3000;
-
 
 void setup()
 {
@@ -54,6 +55,9 @@ void setup()
     pinMode(motionLEDpin, OUTPUT);
     pinMode(leftIn, INPUT);
     pinMode(rightIn, INPUT);
+    pinMode(coarseLEDpin, OUTPUT);
+    pinMode(fineLEDpin, OUTPUT);
+    pinMode(distanceSensorPin, INPUT);
 
     button.setDebounceTime(20); // set debounce time to 50 milliseconds
 
@@ -62,51 +66,65 @@ void setup()
     delay(3000);
 }
 
-
 /******************************** MAIN PROGRAM ********************************/
 void loop()
-{   
-    button.loop(); // MUST call the loop() function first
+{
+    button.loop();
 
-    if (button.isPressed()) {
+    if (button.isPressed())
+    {
         if (loopState == LOOP_STATE_STOPPED)
             loopState = LOOP_STATE_STARTED;
         else // if(loopState == LOOP_STATE_STARTED)
             loopState = LOOP_STATE_STOPPED;
     }
 
-    if (loopState == LOOP_STATE_STARTED) {
+    if (loopState == LOOP_STATE_STARTED) // ALL LOOP CODE INSIDE HERE
+    {
         //left sensor state
         int LineSensor1;
         //right sensor state
         int LineSensor2;
+
         //sets left LineSensor1 to high if on tape, else Low
-        if(analogRead(leftIn)>=850){
+        if (analogRead(leftIn) >= 850)
+        {
             LineSensor1 = HIGH;
         }
-        else {
+        else
+        {
             LineSensor1 = LOW;
         }
         //sets right LineSensor2 to high if on tape, else Low
-        if(analogRead(rightIn)>=850){
+        if (analogRead(rightIn) >= 850)
+        {
             LineSensor2 = HIGH;
         }
-        else {
+        else
+        {
             LineSensor2 = LOW;
         }
 
-
-        if (Ifdeliver == true) {
-            red_box()
+        if (Ifdeliver == true)
+        {
+            if (IfCoarse == true)
+            {
+                red_box();
+            }
+            else
+            {
+                blue_box();
+            }
         }
-        else if (IfRotate == true) {
+        else if (IfRotate == true)
+        {
             rotate180();
-            } 
-        else {
-            line_follow(LineSensor1,LineSensor2);
         }
-    }  
-    
+        else
+        {
+            line_follow(LineSensor1, LineSensor2);
+        }
+    }
 }
 
 /******************************** MOVEMENT FUNCTIONS ********************************/
@@ -116,6 +134,7 @@ void forwards(int speed)
     motor2->setSpeed(speed);
     motor1->run(FORWARD);
     motor2->run(FORWARD);
+    motionLED();
 }
 
 void backwards(int speed)
@@ -124,6 +143,7 @@ void backwards(int speed)
     motor2->setSpeed(speed);
     motor1->run(BACKWARD);
     motor2->run(BACKWARD);
+    motionLED():
 }
 
 void turn_right_forwards(int speed_high, int speed_low)
@@ -132,6 +152,7 @@ void turn_right_forwards(int speed_high, int speed_low)
     motor2->setSpeed(speed_low);
     motor1->run(FORWARD);
     motor2->run(FORWARD);
+    motionLED();
 }
 
 void turn_left_forwards(int speed_high, int speed_low)
@@ -140,6 +161,7 @@ void turn_left_forwards(int speed_high, int speed_low)
     motor2->setSpeed(speed_high);
     motor1->run(FORWARD);
     motor2->run(FORWARD);
+    motionLED();
 }
 
 void rotate_right(int speed)
@@ -148,6 +170,7 @@ void rotate_right(int speed)
     motor2->setSpeed(speed);
     motor1->run(FORWARD);
     motor2->run(BACKWARD);
+    motionLED();
 }
 
 void rotate_left(int speed)
@@ -156,6 +179,7 @@ void rotate_left(int speed)
     motor2->setSpeed(speed);
     motor1->run(BACKWARD);
     motor2->run(FORWARD);
+    motionLED();
 }
 
 void stop()
@@ -164,30 +188,32 @@ void stop()
     motor2->setSpeed(0);
     motor1->run(RELEASE);
     motor2->run(RELEASE);
+    digitalWrite(motionLEDpin, LOW);
 }
 /******************************** 180 TURN ********************************/
-void rotate180(int LineSensor1, int LineSensor2) 
+void rotate180(int LineSensor1, int LineSensor2)
 {
-    if (IsOffLine==false){
-            rotate_right(motorSpeed/3);
-            delay(500);
-            IsOffLine = true;
+    if (IsOffLine == false)
+    {
+        rotate_right(motorSpeed / 3);
+        delay(500);
+        IsOffLine = true;
+    }
+    else
+    {
+        if (LineSensor2 == LOW)
+        {
+            rotate_right(motorSpeed);
         }
-        else{
-            if (LineSensor2==LOW){
-                rotate_right(motorSpeed);
-                
-            }
-            else if (LineSensor2==HIGH){
-                stop();
-                IfRotate=false;
-            }
+        else if (LineSensor2 == HIGH)
+        {
+            stop();
+            IfRotate = false;
+        }
+    }
 }
-
-
-
 /******************************** LINE FOLLOWING ALGORITHM ********************************/
-void line_follow(int LineSensor1,int LineSensor2)
+void line_follow(int LineSensor1, int LineSensor2)
 {
     if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
     {
@@ -206,19 +232,18 @@ void line_follow(int LineSensor1,int LineSensor2)
         journeyLogic();
     }
 }
-
-
 /*********************** DELIVERY *******************/
 void red_box()
-{   forwards(motorSpeed/3);
+{
+    forwards(motorSpeed / 3);
     delay(duration_delivery);
-    turn_right_forwards(motorSpeed/3);
+    turn_right_forwards(motorSpeed / 3);
     delay(duration_90degree);
-    forwards(motorSpeed/3);
+    forwards(motorSpeed / 3);
     delay(duration_delivery);
-    backwards(motorSpeed/3);
+    backwards(motorSpeed / 3);
     delay(duration_delivery);
-    turn_right_forwards(motorSpeed/3);
+    turn_right_forwards(motorSpeed / 3);
     delay(duration_90degree);
     stop();
     Ifdeliver = false;
@@ -226,18 +251,18 @@ void red_box()
 
 void blue_box()
 {
-    forwards(motorSpeed/3);
+    forwards(motorSpeed / 3);
     delay(duration_delivery);
-    turn_left_forwards(motorSpeed/3);
+    turn_left_forwards(motorSpeed / 3);
     delay(duration_90degree);
-    forwards(motorSpeed/3);
+    forwards(motorSpeed / 3);
     delay(duration_delivery);
-    backwards(motorSpeed/3);
+    backwards(motorSpeed / 3);
     delay(duration_delivery);
-    turn_left_forwards(motorSpeed/3);
+    turn_left_forwards(motorSpeed / 3);
     delay(duration_90degree);
     stop()
-    Ifdeliver = false;
+        Ifdeliver = false;
 }
 
 /*********************** JOURNEY LOGIC ***********************/
@@ -245,78 +270,91 @@ void blue_box()
 void journeyLogic()
 {
     switch (journeyCounter)
+    {
+    case journey1:
+
+        switch (junctionCounter)
         {
-        case journey1:
-
-            switch (junctionCounter)
-            {
-            case startJunction:
-                forwards(motorSpeed);
-                junctionCounter++;
-                delay(1000);
-                break;
-            case junction1:
-                forwards(motorSpeed);
-                junctionCounter++;
-                delay(1000);
-                break;
-            case junction2:
-                stop();
-                delay(2000);
-                junctionCounter = deliverJunction;
-                IfRotate = true;
-                break;
-            case deliverJunction:
-                stop();
-                delay(2000);
-                Ifdeliver = true;
-                junctionCounter = junction2;
-                journeyCounter++;
-                break;
-            }            
-        
-        case journey2:
-
-            switch (junctionCounter)
-            {
-            case junction2:
-                forwards(motorSpeed);
-                delay(3000);
-                stop();  // simulate detection of 2nd block
-                delay(2000);
-                junctionCounter++;                
-                ifRotate = true;
-                break;
-            case deliverJunction:
-                stop();
-                delay(2000);
-                Ifdeliver = true;
-                junctionCounter = junction2;
-                journeyCounter++;
-                break;
-            }
-
-        case journey3:
-
-            switch (junctionCounter)
-            {
-            case junction2:
-                forwards(motorSpeed);
-                junctionCounter++;
-                delay(1000);
-                break;
-            case junction3:
-                stop();
-                delay(2000);
-                junctionCounter = deliverJunction;
-                IfRotate = true;
-                break;
-            case deliverJunction:
-                stop();
-                delay(2000);
-                Ifdeliver = true;
-                delay(1000000);
-                break;
-            }
+        case startJunction:
+            forwards(motorSpeed);
+            junctionCounter++;
+            delay(1000);
+            break;
+        case junction1:
+            forwards(motorSpeed);
+            junctionCounter++;
+            delay(1000);
+            break;
+        case junction2:
+            stop();
+            delay(2000);
+            junctionCounter = deliverJunction;
+            IfRotate = true;
+            break;
+        case deliverJunction:
+            stop();
+            delay(2000);
+            Ifdeliver = true;
+            junctionCounter = junction2;
+            journeyCounter++;
+            break;
         }
+
+    case journey2:
+
+        switch (junctionCounter)
+        {
+        case junction2:
+            forwards(motorSpeed);
+            delay(3000);
+            stop(); // simulate detection of 2nd block
+            delay(2000);
+            junctionCounter++;
+            ifRotate = true;
+            break;
+        case deliverJunction:
+            stop();
+            delay(2000);
+            Ifdeliver = true;
+            junctionCounter = junction2;
+            journeyCounter++;
+            break;
+        }
+
+    case journey3:
+
+        switch (junctionCounter)
+        {
+        case junction2:
+            forwards(motorSpeed);
+            junctionCounter++;
+            delay(1000);
+            break;
+        case junction3:
+            stop();
+            delay(2000);
+            junctionCounter = deliverJunction;
+            IfRotate = true;
+            break;
+        case deliverJunction:
+            stop();
+            delay(2000);
+            Ifdeliver = true;
+            delay(1000000);
+            break;
+        }
+    }
+}
+
+/******************** INDICATOR LEDS *********************/
+void toggleCoarseLED() {
+    digitalWrite(coarseLEDpin, !digitalRead(coarseLEDpin));
+}
+
+void toggleFineLED() {
+    digitalWrite(fineLEDpin, !digitalRead(fineLEDpin));
+}
+
+void motionLED() {
+    digitalWrite(motionLEDpin, HIGH);
 }

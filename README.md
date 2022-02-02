@@ -10,11 +10,12 @@ To do:
 - [x] Push button / serial command + time delay to start program
 - [x] Three journey test protocol
 - [x] Switch-case structure
-- [ ] Call functions from .cpp and .h files
+- [ ] Write servo actuation code
 - [ ] Write block detection code
 - [ ] Write block identification code
-- [ ] Write servo actuation code
-- [ ] Introduce decision-based LED signals and movement LED
+
+- [x] Introduce decision-based LED signals and movement LED
 - [ ] Write third pass search, store, fetch algorithm
+- [ ] Call functions from .cpp and .h files
 
 By Amanda Ge and Charlie Brunt

@@ -3,6 +3,8 @@
 Servo myservo;
 
 int pos = 0; // variable to store the servo position
+const int servo_startangle = 0;
+const int servo_endangle = 90;
 
 void setup()
 {
@@ -11,15 +13,21 @@ void setup()
 
 void loop()
 {
-  for (pos = 0; pos <= 120; pos += 1)
-  { // goes from 0 degrees to 180 degrees
-    // in steps of 1 degree
-    myservo.write(pos); // tell servo to go to position in variable 'pos'
-    delay(15);          // waits 15 ms for the servo to reach the position
-  }
-  for (pos = 120; pos >= 0; pos -= 1)
-  {                     // goes from 180 degrees to 0 degrees
-    myservo.write(pos); // tell servo to go to position in variable 'pos'
-    delay(15);          // waits 15 ms for the servo to reach the position
-  }
+  open_servo();
+  close_servo()
+
+}
+
+
+void open_servo(){
+  for (pos = servo_startangle; pos <= servo_endangle; pos += 1)
+  { 
+    myservo.write(pos);
+    delay(1000);
+}
+void close_servo(){
+  for (pos = servo_endangle; pos <= servo_startangle; pos -= 1)
+  { 
+    myservo.write(pos);
+    delay(1000);
 }

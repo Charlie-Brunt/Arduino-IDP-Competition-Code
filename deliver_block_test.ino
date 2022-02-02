@@ -261,8 +261,8 @@ void blue_box()
     delay(duration_delivery);
     turn_left_forwards(motorSpeed / 3);
     delay(duration_90degree);
-    stop()
-        Ifdeliver = false;
+    stop();
+    Ifdeliver = false;
 }
 
 /*********************** JOURNEY LOGIC ***********************/

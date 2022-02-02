@@ -72,51 +72,6 @@ void loop()
         turn_left(motorSpeed, motorSpeed / 4);
         Serial.println("left");
     }
-    // else if ((LineSensor1 == HIGH) && (LineSensor2 == HIGH))
-    // {
-
-    //     switch (junctionCounter)
-    //     {
-    //     case 0:
-    //         forwards(motorSpeed);
-    //         junctionCounter++;
-    //         break;
-    //     case 1:
-    //         stop();
-    //         delay(3000);
-    //         forwards(motorSpeed);
-    //         junctionCounter++;
-    //         break;
-    //     case 2:
-    //         stop();
-    //         delay(3000);
-    //         forwards(motorSpeed);
-    //         junctionCounter++;
-    //         break;
-    //     case 3:
-    //         stop();
-    //         rotate_left(motorSpeed);
-    //         delay(2000); // adjust this so angle is 180
-    //         stop();
-    //         forwards(motorSpeed);
-    //         break;
-    //     case 4:
-    //         junctionCounter++;
-    //         break;
-    //     case 5:
-    //         stop();
-    //         delay(3000);
-    //         forwards(motorSpeed);
-    //         junctionCounter++;
-    //         break;
-    //     case 6:
-    //         forwards(motorSpeed);
-    //         delay(1000); // tune this so inside box
-    //         stop();
-    //         delay(1000000000);
-    //         break;
-    //     }
-    // }
 }
 
 void forwards(int speed)

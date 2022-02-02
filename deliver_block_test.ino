@@ -208,7 +208,7 @@ void line_follow(int LineSensor1,int LineSensor2)
 }
 
 
-/***********************delivery*******************/
+/*********************** DELIVERY *******************/
 void red_box()
 {   forwards(motorSpeed/3);
     delay(duration_delivery);

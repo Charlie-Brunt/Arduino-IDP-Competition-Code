@@ -124,22 +124,6 @@ void loop()
         }
 
 
-        if (Ifdeliver == true)
-        {
-            if (IfCoarse == true)
-            {
-                red_box();
-            }
-            else
-            {
-                blue_box();
-            }
-        }
-        else if (Ifdetected == true){
-            close_servo();
-            IfCollected = true;
-            rotate180();
-            Ifdetected = false;
         }
         else {
             line_follow(LineSensor1, LineSensor2);
@@ -147,25 +131,23 @@ void loop()
 
         distance_cm = mySensor.distance();
 
+
+        // When IfCOllected is TRUE, turn off IR
         if ((journeyCounter == journey1) && (IfCollected == false){
         unsigned long currentMillis = millis();
 
             if (currentMillis - previousMillis > bridgeDuration1) {
-                checkDistance();
+                collectIfInRange();
             }
         }
         if ((journeyCounter == journey2) && (junctionCounter == junction3) && (IfCollected == false) {
-            checkDistance();
+            collectIfInRange();
         }
         if ((journeyCounter == journey3) && (junctionCounter == junction3) && (IfCollected == false) {
-            checkDistance();
+            collectIfInRange();
         }
-
- 
-
     }
 }
-
 /******************************** MOVEMENT FUNCTIONS ********************************/
 void forwards(int speed)
 {
@@ -286,7 +268,6 @@ void red_box()
     turn_right_forwards(motorSpeed / 3);
     delay(duration_90degree);
     stop();
-    Ifdeliver = false;
     IfCollected = false;
 }
 
@@ -304,10 +285,19 @@ void blue_box()
     turn_left_forwards(motorSpeed / 3);
     delay(duration_90degree);
     stop();
-    Ifdeliver = false;
     IfCollected = false;
 }
 
+void deliver() {
+    if (IfCoarse == true)
+    {
+        red_box();
+    }
+    else
+    {
+        blue_box();
+    }
+}
 /*********************** JOURNEY LOGIC ***********************/
 
 void journeyLogic()
@@ -331,7 +321,7 @@ void journeyLogic()
         case deliverJunction:
             stop();
             delay(2000);
-            Ifdeliver = true;
+            deliver();
             junctionCounter = junction2;
             journeyCounter++;
             break;
@@ -342,13 +332,17 @@ void journeyLogic()
         switch (junctionCounter)
         {
         case junction2:
-            junctionCounter = deliverJunction;
+            junctionCounter++;
             delay(1000);
+            break;
+        case junction3: // Virtual junction 2 for when crossing it again
+            junctionCounter = deliverJunction;
+            delay(2000);
             break;
         case deliverJunction:
             stop();
             delay(2000);
-            Ifdeliver = true;
+            deliver();
             junctionCounter = junction2;
             journeyCounter++;
             break;
@@ -367,12 +361,12 @@ void journeyLogic()
             stop();
             delay(2000);
             junctionCounter = deliverJunction;
-            IfRotate = true;
+            search();
             break;
         case deliverJunction:
             stop();
             delay(2000);
-            Ifdeliver = true;
+            deliver();
             delay(1000000);
             break;
         }
@@ -392,10 +386,12 @@ void motionLED() {
     digitalWrite(motionLEDpin, HIGH);
 }
 /************************ DETECTION ***************************/
-void checkDistance() {
+void collectIfInRange() {
     if (distance_cm <= 10) {
         stop();
-        Ifdetected = true;
+        close_servo();
+        IfCollected = true;
+        rotate180();
     }
 }
 
@@ -412,3 +408,6 @@ void close_servo(){
     myservo.write(pos);
     delay(500);
 }
+
+/************************* SEARCH FUNCTION ***********************************/
+void search();

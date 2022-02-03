@@ -19,7 +19,7 @@ void setup() {
 }
 
 void loop() {
-    distance_cm = mySensor.distance();
+    distance_cm = mySensor.getDistance();
 
     if ((journeyCounter == journey1) && (IfCollected == false){
         unsigned long currentMillis = millis();

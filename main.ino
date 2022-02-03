@@ -129,7 +129,7 @@ void loop()
             line_follow(LineSensor1, LineSensor2);
         }
 
-        distance_cm = mySensor.distance();
+        distance_cm = mySensor.getDistance();
 
 
         // When IfCOllected is TRUE, turn off IR

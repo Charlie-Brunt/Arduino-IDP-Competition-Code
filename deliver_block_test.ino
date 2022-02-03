@@ -118,7 +118,7 @@ void loop()
         }
         else if (IfRotate == true)
         {
-            rotate180();
+            rotate180(LineSensor1, LineSensor2);
         }
         else
         {
@@ -143,7 +143,7 @@ void backwards(int speed)
     motor2->setSpeed(speed);
     motor1->run(BACKWARD);
     motor2->run(BACKWARD);
-    motionLED():
+    motionLED();
 }
 
 void turn_right_forwards(int speed_high, int speed_low)
@@ -238,13 +238,13 @@ void red_box()
 {
     forwards(motorSpeed / 3);
     delay(duration_delivery);
-    turn_right_forwards(motorSpeed / 3);
+    turn_right_forwards(motorSpeed, motorSpeed / 3);
     delay(duration_90degree);
     forwards(motorSpeed / 3);
     delay(duration_delivery);
     backwards(motorSpeed / 3);
     delay(duration_delivery);
-    turn_right_forwards(motorSpeed / 3);
+    turn_right_forwards(motorSpeed, motorSpeed / 3);
     delay(duration_90degree);
     stop();
     Ifdeliver = false;
@@ -254,13 +254,13 @@ void blue_box()
 {
     forwards(motorSpeed / 3);
     delay(duration_delivery);
-    turn_left_forwards(motorSpeed / 3);
+    turn_left_forwards(motorSpeed, motorSpeed / 3);
     delay(duration_90degree);
     forwards(motorSpeed / 3);
     delay(duration_delivery);
     backwards(motorSpeed / 3);
     delay(duration_delivery);
-    turn_left_forwards(motorSpeed / 3);
+    turn_left_forwards(motorSpeed, motorSpeed / 3);
     delay(duration_90degree);
     stop();
     Ifdeliver = false;
@@ -311,7 +311,7 @@ void journeyLogic()
             stop(); // simulate detection of 2nd block
             delay(2000);
             junctionCounter++;
-            ifRotate = true;
+            IfRotate = true;
             break;
         case junction3:
             forwards(motorSpeed);

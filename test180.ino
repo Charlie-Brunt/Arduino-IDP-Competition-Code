@@ -65,8 +65,8 @@ void loop()
     if (IfRotate == true) {
         Serial.println("rotate");
         if (IsOffLine==false){
-            rotate_right(motorSpeed/3);
-            delay(500);
+            rotate_right(motorSpeed);
+            delay(2000);
             IsOffLine = true;
             Serial.println("offline");
         }
@@ -163,7 +163,7 @@ void line_follow(int LineSensor1,int LineSensor2)
     else if ((LineSensor1 == HIGH) && (LineSensor2 == HIGH))
     {
         stop();
-        delay(2000);
+        delay(1000);
         IfRotate = true;
     }
 }

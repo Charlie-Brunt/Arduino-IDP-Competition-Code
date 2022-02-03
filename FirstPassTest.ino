@@ -15,6 +15,8 @@ const float motorSpeed = 255; // Adjust motor speed here
 const int turningRate = 0;    // Potential for turning rate adjustment?
 const int duration = 1000;
 bool lfReverse = false; 
+bool IsOffLine = false;
+bool IfRotate = false;
 
 // function definitions
 void forwards();
@@ -60,71 +62,12 @@ void loop()
         LineSensor2 = LOW;
     }    
 
-    // Line-following algorithm
-    if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
-    {
-        if(lfReverse == false){
-            forwards(motorSpeed);
-            Serial.println("forwards"); 
-        } else {
-            backwards(motorSpeed);
-            Serial.println("backwards"); 
-        }
+    if (IfRotate == true) {
+        rotate180(LineSensor1, LineSensor2);
     }
-    else if ((LineSensor1 == LOW) && (LineSensor2 == HIGH))
-    {   
-        if(lfReverse == false){
-            turn_right_forwards(motorSpeed, motorSpeed / 4);
-            Serial.println("right"); 
-        } else {
-            turn_left_backwards(motorSpeed, motorSpeed / 4);
-            Serial.println("left");
-        }
-        
-    }
-    else if ((LineSensor1 == HIGH) && (LineSensor2 == LOW))
-    {
-        if(lfReverse == false){
-            turn_left_forwards(motorSpeed, motorSpeed / 4);
-            Serial.println("left"); 
-        } else {
-            turn_right_backwards(motorSpeed, motorSpeed / 4);
-            Serial.println("right");
-        } 
-    }
-    else if ((LineSensor1 == HIGH) && (LineSensor2 == HIGH))
-    {
-
-        switch (junctionCounter)
-        {
-        case 0:
-            forwards(motorSpeed);
-            junctionCounter++;
-            delay(1000);
-            break;
-        case 1:
-            forwards(motorSpeed);
-            junctionCounter++;
-            delay(1000);
-            break;
-        case 2:
-            stop();
-            lfReverse = true;
-            delay(3000);
-            backwards(motorSpeed);
-            delay(1000);
-            stop();
-            // rotate_right(motorSpeed);
-            // delay(duration);
-            // stop();
-            // forwards(motorSpeed);
-            junctionCounter++;
-            break;
-        case 3:
-            stop();
-            delay(1000000000);
-            break;
-        }
+    else{
+        Serial.println("line follow");
+        line_follow(LineSensor1,LineSensor2);
     }
 }
 
@@ -198,4 +141,68 @@ void stop()
     motor2->setSpeed(0);
     motor1->run(RELEASE);
     motor2->run(RELEASE);
+}
+/******************************** 180 TURN ********************************/
+void rotate180(int LineSensor1, int LineSensor2)
+{
+    if (IsOffLine == false)
+    {
+        rotate_right(motorSpeed);
+        delay(1000);
+        IsOffLine = true;
+    }
+    else
+    {
+        if (LineSensor2 == LOW)
+        {
+            rotate_right(motorSpeed);
+        }
+        else if (LineSensor2 == HIGH)
+        {
+            stop();
+            IsOffLine = false;
+            IfRotate=false;
+        }
+    }
+}
+/******************************** LINE FOLLOWING ALGORITHM ********************************/
+void line_follow(int LineSensor1,int LineSensor2)
+{
+    if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
+    {
+        forwards(motorSpeed);
+    }
+    else if ((LineSensor1 == LOW) && (LineSensor2 == HIGH))
+    {
+        turn_right_forwards(motorSpeed, motorSpeed / 4);
+    }
+    else if ((LineSensor1 == HIGH) && (LineSensor2 == LOW))
+    {
+        turn_left_forwards(motorSpeed, motorSpeed / 4);
+    }
+    else if ((LineSensor1 == HIGH) && (LineSensor2 == HIGH))
+    {
+        switch (junctionCounter)
+        {
+        case 0:
+            forwards(motorSpeed);
+            junctionCounter++;
+            delay(1500);
+            break;
+        case 1:
+            forwards(motorSpeed);
+            junctionCounter++;
+            delay(1500);
+            break;
+        case 2:
+            stop();
+            IfRotate = true;
+            junctionCounter++;
+            break;
+        case 3:
+            stop();
+            delay(1000000000);
+            break;
+        }
+    }
 }

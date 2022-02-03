@@ -290,6 +290,7 @@ void red_box()
     delay(duration_90degree);
     stop();
     Ifdeliver = false;
+    IfCollected = false;
 }
 
 void blue_box()
@@ -306,6 +307,7 @@ void blue_box()
     delay(duration_90degree);
     stop();
     Ifdeliver = false;
+    IfCollected = false;
 }
 
 /*********************** JOURNEY LOGIC ***********************/
@@ -325,14 +327,8 @@ void journeyLogic()
             break;
         case junction1:
             forwards(motorSpeed);
-            junctionCounter++;
-            delay(1000);
-            break;
-        case junction2:
-            stop();
-            delay(2000);
             junctionCounter = deliverJunction;
-            IfRotate = true;
+            delay(1000);
             break;
         case deliverJunction:
             stop();

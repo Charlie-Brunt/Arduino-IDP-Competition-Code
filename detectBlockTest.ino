@@ -28,10 +28,10 @@ void loop() {
             checkDistance();
         }
     }
-    if ((journeyCounter == journey2) && (junctionCounter == junction2) && (IfCollected == false) {
+    if ((journeyCounter == journey2) && (junctionCounter == junction3) && (IfCollected == false) {
         checkDistance();
     }
-    if ((journeyCounter == journey3) && (junctionCounter == junction2) && (IfCollected == false) {
+    if ((journeyCounter == journey3) && (junctionCounter == junction3) && (IfCollected == false) {
         checkDistance();
     }
 }

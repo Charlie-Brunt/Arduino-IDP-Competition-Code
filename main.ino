@@ -135,14 +135,10 @@ void loop()
                 blue_box();
             }
         }
-        else if (IfRotate == true)
-        {
-            rotate180();
-        }
         else if (Ifdetected == true){
             close_servo();
             IfCollected = true;
-            IfRotate =true;
+            rotate180();
             Ifdetected = false;
         }
         else {
@@ -251,7 +247,6 @@ void rotate180(int LineSensor1, int LineSensor2)
         else if (LineSensor2 == HIGH)
         {
             stop();
-            IfRotate = false;
             IsOffLine = false;
         }
     }
@@ -285,6 +280,7 @@ void red_box()
     delay(duration_90degree);
     forwards(motorSpeed / 3);
     delay(duration_delivery);
+    open_servo();
     backwards(motorSpeed / 3);
     delay(duration_delivery);
     turn_right_forwards(motorSpeed / 3);
@@ -302,6 +298,7 @@ void blue_box()
     delay(duration_90degree);
     forwards(motorSpeed / 3);
     delay(duration_delivery);
+    open_servo();
     backwards(motorSpeed / 3);
     delay(duration_delivery);
     turn_left_forwards(motorSpeed / 3);
@@ -407,11 +404,11 @@ void open_servo(){
   for (pos = servo_startangle; pos <= servo_endangle; pos += 1)
   { 
     myservo.write(pos);
-    delay(1000);
+    delay(500);
 }
 void close_servo(){
   for (pos = servo_endangle; pos <= servo_startangle; pos -= 1)
   { 
     myservo.write(pos);
-    delay(1000);
+    delay(500);
 }

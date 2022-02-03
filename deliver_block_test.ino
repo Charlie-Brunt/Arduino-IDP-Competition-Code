@@ -313,6 +313,11 @@ void journeyLogic()
             junctionCounter++;
             ifRotate = true;
             break;
+        case junction3:
+            forwards(motorSpeed);
+            junctionCounter = deliverJunction;
+            delay(2000);
+            break;
         case deliverJunction:
             stop();
             delay(2000);

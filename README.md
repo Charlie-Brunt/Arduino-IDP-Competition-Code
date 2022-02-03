@@ -18,4 +18,19 @@ To do:
 - [ ] Write third pass search, store, fetch algorithm
 - [ ] Call functions from .cpp and .h files
 
+Files:
+- deliver_block_test - test program to test line following and rotate180 for three journeys
+- deliver_test - calibration for delivering blocks
+- checkDistance - logic for checking distance for each journey (redundant)
+- FirstPassTest - initial first pass code (redundant)
+- IRsensorTest - serial write distance readings from IR sensor#
+- LineFollowerTest - test for basic line following
+- main - first main program including all features
+- motionSerialTest - send serial commands to control motion
+- MotionTest - all motion functions
+- ServoTest - test servo actuation
+- test180 - test 180 deg rotations  
+
+
+
 By Amanda Ge and Charlie Brunt

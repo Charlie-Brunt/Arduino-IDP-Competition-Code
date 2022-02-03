@@ -33,10 +33,6 @@ void loop() {
     if ((journeyCounter == journey3) && (junctionCounter == junction2) && (IfCollected == false) {
         checkDistance();
     }
-
-
-
-
 }
 
 /************************ DETECTION ***************************/

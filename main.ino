@@ -5,9 +5,6 @@
 #include <SharpIR.h>
 #include <Servo.h>
 
-
-// Create a new instance of the SharpIR class:
-SharpIR mySensor = SharpIR(IRPin, model);
 // Pin assignments
 #define leftIn A0  // left IR sensor
 #define rightIn A1 // right IR sensor
@@ -34,8 +31,12 @@ const int servo_endangle = 90;
 // Push button setup
 #define LOOP_STATE_STOPPED 0
 #define LOOP_STATE_STARTED 1
-ezButton button(pushButtonPin);  // create ezButton object that attach to pin 7;
+ezButton button(pushButtonPin);  // create ezButton object that attach to pin 7
 int loopState = LOOP_STATE_STOPPED;
+
+// IR sensor setup
+SharpIR mySensor = SharpIR(IRPin, model);
+int distance_cm;
 
 // Flags, state variables
 int junctionCounter = 0;
@@ -55,17 +56,15 @@ bool IfCoarse = false;
 bool IfRotate = false;
 bool IsOffLine = false;
 bool Ifdeliver = false;
-bool IfCollected = false;
+bool carryingBlock = false;
 bool Ifdetected = false;
 
 //Parameters
 const float motorSpeed = 255; // Adjust motor speed here
 const int duration_90degree = 6000;
 const int duration_delivery = 3000;
-// Create variable to store the distance:
-int distance_cm;
-int bridgeDuration1 = 10000;
-long previousMillis = 0;
+const int bridgeDuration1 = 10000;
+long previousMillis;
 
 void setup()
 {
@@ -82,11 +81,13 @@ void setup()
     Serial.begin(9600);
     Serial.println("Ready!");
     delay(3000);
+    long previousMillis = millis();
 }
 
-/******************************** MAIN PROGRAM ********************************/
+/******************************** LOOP ********************************/
 void loop()
 {
+    // Push button start/stop
     button.loop();
 
     if (button.isPressed())
@@ -97,54 +98,36 @@ void loop()
             loopState = LOOP_STATE_STOPPED;
     }
 
-    if (loopState == LOOP_STATE_STARTED) // ALL LOOP CODE INSIDE HERE
+    if (loopState == LOOP_STATE_STARTED)
     {
-        //left sensor state
-        int LineSensor1;
-        //right sensor state
-        int LineSensor2;
+        /************************ MAIN PROGRAM STARTS HERE ************************/
 
-        //sets left LineSensor1 to high if on tape, else Low
-        if (analogRead(leftIn) >= 850)
-        {
-            LineSensor1 = HIGH;
-        }
-        else
-        {
-            LineSensor1 = LOW;
-        }
-        //sets right LineSensor2 to high if on tape, else Low
-        if (analogRead(rightIn) >= 850)
-        {
-            LineSensor2 = HIGH;
-        }
-        else
-        {
-            LineSensor2 = LOW;
-        }
+        updateLineSensors(850);  // reads line sensor analog data and assigns HIGH / LOW
+        distance_cm = mySensor.getDistance();  // update distance sensor
 
-
+        // prevents line_follow and rotate180 conflicting
+        if (IfRotate == true) {
+        rotate180(LineSensor1, LineSensor2);
         }
         else {
             line_follow(LineSensor1, LineSensor2);
         }
 
-        distance_cm = mySensor.getDistance();
-
-
-        // When IfCOllected is TRUE, turn off IR
-        if ((journeyCounter == journey1) && (IfCollected == false){
-        unsigned long currentMillis = millis();
-
-            if (currentMillis - previousMillis > bridgeDuration1) {
+        /* Turn on IR if certain conditions are met e.g. clear of the ramp or 
+        junction 2 and if not carrying the block */
+        if (carryingBlock == false) {
+            if ((journeyCounter == journey1) {
+                unsigned long currentMillis = millis();
+                if (currentMillis - previousMillis > bridgeDuration1) {
+                    collectIfInRange();
+                }
+            }
+            else if ((journeyCounter == journey2) && (junctionCounter == junction3)) {
                 collectIfInRange();
             }
-        }
-        if ((journeyCounter == journey2) && (junctionCounter == junction3) && (IfCollected == false) {
-            collectIfInRange();
-        }
-        if ((journeyCounter == journey3) && (junctionCounter == junction3) && (IfCollected == false) {
-            collectIfInRange();
+            else if ((journeyCounter == journey3) && (junctionCounter == junction3)) {
+                collectIfInRange();
+            }
         }
     }
 }
@@ -268,7 +251,7 @@ void red_box()
     turn_right_forwards(motorSpeed / 3);
     delay(duration_90degree);
     stop();
-    IfCollected = false;
+    carryingBlock = false;
 }
 
 void blue_box()
@@ -285,7 +268,7 @@ void blue_box()
     turn_left_forwards(motorSpeed / 3);
     delay(duration_90degree);
     stop();
-    IfCollected = false;
+    carryingBlock = false;
 }
 
 void deliver() {
@@ -311,16 +294,17 @@ void journeyLogic()
         case startJunction:
             forwards(motorSpeed);
             junctionCounter++;
-            delay(1000);
+            delay(1500);
             break;
         case junction1:
             forwards(motorSpeed);
             junctionCounter = deliverJunction;
-            delay(1000);
+            long previousMillis = millis();  // bridge timer starts here
+            delay(1500);
             break;
         case deliverJunction:
             stop();
-            delay(2000);
+            delay(1500);
             deliver();
             junctionCounter = junction2;
             journeyCounter++;
@@ -332,16 +316,18 @@ void journeyLogic()
         switch (junctionCounter)
         {
         case junction2:
-            junctionCounter++;
+            forwards(motorSpeed);
+            junctionCounter = junction3;  // Virtual junction 2 for return journey
             delay(1000);
             break;
-        case junction3: // Virtual junction 2 for when crossing it again
+        case junction3:
+            forwards(motorSpeed);
             junctionCounter = deliverJunction;
-            delay(2000);
+            delay(1500);
             break;
         case deliverJunction:
             stop();
-            delay(2000);
+            delay(1500);
             deliver();
             junctionCounter = junction2;
             journeyCounter++;
@@ -355,19 +341,19 @@ void journeyLogic()
         case junction2:
             forwards(motorSpeed);
             junctionCounter++;
-            delay(1000);
+            delay(1500);
             break;
         case junction3:
             stop();
-            delay(2000);
-            junctionCounter = deliverJunction;
+            delay(1500);
             search();
+            junctionCounter = deliverJunction;
             break;
         case deliverJunction:
             stop();
-            delay(2000);
+            delay(1500);
             deliver();
-            delay(1000000);
+            delay(1000000); // Placeholder to end program
             break;
         }
     }
@@ -390,7 +376,7 @@ void collectIfInRange() {
     if (distance_cm <= 10) {
         stop();
         close_servo();
-        IfCollected = true;
+        carryingBlock = true;
         rotate180();
     }
 }
@@ -410,4 +396,33 @@ void close_servo(){
 }
 
 /************************* SEARCH FUNCTION ***********************************/
-void search();
+void search() {
+
+}
+
+/********************** LINE SENSOR UPDATE STATE ***************************/
+void updateLineSensors(int threshold = 850) {
+    //left sensor state
+    int LineSensor1;
+    //right sensor state
+    int LineSensor2;
+
+    //sets left LineSensor1 to high if on tape, else Low
+    if (analogRead(leftIn) >= threshold)
+    {
+        LineSensor1 = HIGH;
+    }
+    else
+    {
+        LineSensor1 = LOW;
+    }
+    //sets right LineSensor2 to high if on tape, else Low
+    if (analogRead(rightIn) >= threshold)
+    {
+        LineSensor2 = HIGH;
+    }
+    else
+    {
+        LineSensor2 = LOW;
+    }    
+}

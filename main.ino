@@ -252,6 +252,7 @@ void rotate180(int LineSensor1, int LineSensor2)
         {
             stop();
             IfRotate = false;
+            IsOffLine = false;
         }
     }
 }

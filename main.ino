@@ -3,6 +3,7 @@
 #include "utility/Adafruit_MS_PWMServoDriver.h"
 #include <ezButton.h>
 #include <SharpIR.h>
+#include <Servo.h>
 
 
 // Create a new instance of the SharpIR class:
@@ -23,6 +24,12 @@ SharpIR mySensor = SharpIR(IRPin, model);
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *motor1 = AFMS.getMotor(1);
 Adafruit_DCMotor *motor2 = AFMS.getMotor(2);
+
+// Servo setup
+Servo myservo;
+int pos = 0; // variable to store the servo position
+const int servo_startangle = 0;
+const int servo_endangle = 90;
 
 // Push button setup
 #define LOOP_STATE_STOPPED 0
@@ -49,6 +56,7 @@ bool IfRotate = false;
 bool IsOffLine = false;
 bool Ifdeliver = false;
 bool IfCollected = false;
+bool Ifdetected = false;
 
 //Parameters
 const float motorSpeed = 255; // Adjust motor speed here
@@ -131,8 +139,13 @@ void loop()
         {
             rotate180();
         }
-        else
-        {
+        else if (Ifdetected == true){
+            close_servo();
+            IfCollected = true;
+            IfRotate =true;
+            Ifdetected = false;
+        }
+        else {
             line_follow(LineSensor1, LineSensor2);
         }
 
@@ -388,5 +401,20 @@ void motionLED() {
 void checkDistance() {
     if (distance_cm <= 10) {
         stop();
+        Ifdetected = true;
     }
+}
+
+/********************** SERVO ********************************/
+void open_servo(){
+  for (pos = servo_startangle; pos <= servo_endangle; pos += 1)
+  { 
+    myservo.write(pos);
+    delay(1000);
+}
+void close_servo(){
+  for (pos = servo_endangle; pos <= servo_startangle; pos -= 1)
+  { 
+    myservo.write(pos);
+    delay(1000);
 }

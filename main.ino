@@ -38,6 +38,10 @@ int loopState = LOOP_STATE_STOPPED;
 SharpIR mySensor = SharpIR(IRPin, model);
 int distance_cm;
 
+// Line sensor setup
+int LineSensor1;
+int LineSensor2;
+
 // Flags, state variables
 int junctionCounter = 0;
 #define startJunction 0   // for passing out of start box
@@ -102,10 +106,6 @@ void loop()
     {
         /************************ MAIN PROGRAM STARTS HERE ************************/
         
-        //left sensor state
-        int LineSensor1;
-        //right sensor state
-        int LineSensor2;
 
         updateLineSensors(850);  // reads line sensor analog data and assigns HIGH / LOW
         distance_cm = mySensor.getDistance();  // update distance sensor

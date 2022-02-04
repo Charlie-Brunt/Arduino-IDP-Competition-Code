@@ -227,34 +227,46 @@ void line_follow()
 /*********************** DELIVERY *******************/
 void red_box()
 {
-    forwards(motorSpeed / 3);
+    forwards(motorSpeed / 2);
     delay(duration_delivery);
-    turn_right_forwards(motorSpeed / 3);
+    rotate_right(motorSpeed/2);
     delay(duration_90degree);
-    forwards(motorSpeed / 3);
+    stop();
+    delay(2000);
+    forwards(motorSpeed / 2);
     delay(duration_delivery);
-    open_servo();
-    backwards(motorSpeed / 3);
+    backwards(motorSpeed/2);
     delay(duration_delivery);
-    turn_right_forwards(motorSpeed / 3);
-    delay(duration_90degree);
+    rotate_right(motorSpeed/2);
+    delay(duration_90degree*0.8);
+    updateLineSensors(850);
+    while (LineSensor2 == LOW){
+      updateLineSensors(850);
+      rotate_right(motorSpeed/2);
+    }
     stop();
     carryingBlock = false;
 }
 
 void blue_box()
 {
-    forwards(motorSpeed / 3);
+    forwards(motorSpeed / 2);
     delay(duration_delivery);
-    turn_left_forwards(motorSpeed / 3);
+    rotate_left(motorSpeed/2);
     delay(duration_90degree);
-    forwards(motorSpeed / 3);
+    stop();
+    delay(2000);
+    forwards(motorSpeed / 2);
     delay(duration_delivery);
-    open_servo();
-    backwards(motorSpeed / 3);
+    backwards(motorSpeed/2);
     delay(duration_delivery);
-    turn_left_forwards(motorSpeed / 3);
-    delay(duration_90degree);
+    rotate_left(motorSpeed/2);
+    delay(duration_90degree*0.8);
+    updateLineSensors(850);
+    while (LineSensor1 == LOW){
+      updateLineSensors(850);
+      rotate_left(motorSpeed/2);
+    }
     stop();
     carryingBlock = false;
 }

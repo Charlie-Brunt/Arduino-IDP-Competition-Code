@@ -2,7 +2,8 @@
 
 Arduino Uno Wifi Rev 2 code for "The Thing" including test programs for testing motors, servos, movement commands, line following and block detection.
 
-To do:
+## To do:
+
 - [x] Test motors, servos, line sensors
 - [x] Motion commands with serial control
 - [x] Line following algorithm
@@ -10,26 +11,27 @@ To do:
 - [x] Push button / serial command + time delay to start program
 - [x] Three journey test protocol
 - [x] Switch-case structure
-- [ ] Write servo actuation code
-- [ ] Write block detection code
-- [ ] Write block identification code
-
 - [x] Introduce decision-based LED signals and movement LED
+- [x] Write servo actuation code
+- [x] Write block detection code
+- [ ] Update deliver_block_test with main code
+- [ ] Write block identification code
 - [ ] Write third pass search, store, fetch algorithm
 - [ ] Call functions from .cpp and .h files
+- [ ] Backup standard credit program
+## Files:
 
-Files:
-- deliver_block_test - test program to test line following and rotate180 for three journeys
-- deliver_test - calibration for delivering blocks
-- checkDistance - logic for checking distance for each journey (redundant)
-- FirstPassTest - initial first pass code (redundant)
-- IRsensorTest - serial write distance readings from IR sensor#
-- LineFollowerTest - test for basic line following
-- main - first main program including all features
-- motionSerialTest - send serial commands to control motion
-- MotionTest - all motion functions
-- ServoTest - test servo actuation
-- test180 - test 180 deg rotations  
+- **deliver_block_test** - test program to test line following, rotate180 and deliver for three journeys
+- **deliver_test** - calibration for delivering blocks
+- **check_distance** - logic for checking distance for each journey (redundant)
+- **first_pass_test** - initial first pass code (redundant)
+- **IR_sensor_test** - serial write distance readings from IR sensor#
+- **line_follower_test** - test for basic line following
+- **main** - first main program including all features
+- **motion_serial_test** - send serial commands to control motion
+- **motion_test** - all motion functions
+- **servo_test** - test servo actuation
+- **rotate_180_test** - test line follow and 180 deg rotations at junctions 
 
 
 

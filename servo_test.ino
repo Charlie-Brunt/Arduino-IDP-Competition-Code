@@ -14,7 +14,9 @@ void setup()
 void loop()
 {
   open_servo();
-  close_servo()
+  delay(1000);
+  close_servo();
+  delay(1000);
 
 }
 
@@ -24,10 +26,12 @@ void open_servo(){
   { 
     myservo.write(pos);
     delay(1000);
+  }
 }
-void close_servo(){
+void close_servo() {
   for (pos = servo_endangle; pos <= servo_startangle; pos -= 1)
   { 
     myservo.write(pos);
     delay(1000);
+  }
 }

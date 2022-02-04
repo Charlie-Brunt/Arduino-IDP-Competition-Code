@@ -163,7 +163,7 @@ void line_follow(int LineSensor1,int LineSensor2)
     else if ((LineSensor1 == HIGH) && (LineSensor2 == HIGH))
     {
         stop();
-        delay(1000);
+        delay(500);
         IfRotate = true;
     }
 }

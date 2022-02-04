@@ -21,6 +21,9 @@ bool IfRotate = false;
 int LineSensor1;
 int LineSensor2;
 
+const int duration_90degree = 3500;
+const int duration_delivery = 2000;
+
 // function definitions
 void forwards();
 void stop();
@@ -189,7 +192,8 @@ void line_follow()
             break;
         case 3:
             stop();
-            delay(1000000000);
+            blue_box();
+            junctionCounter = 2;
             break;
         }
     }
@@ -214,4 +218,48 @@ void updateLineSensors(int threshold = 850) {
     {
         LineSensor2 = LOW;
     }    
+}
+
+void red_box()
+{
+    forwards(motorSpeed / 2);
+    delay(duration_delivery);
+    rotate_right(motorSpeed/2);
+    delay(duration_90degree);
+    stop();
+    delay(2000);
+    forwards(motorSpeed / 2);
+    delay(duration_delivery);
+    backwards(motorSpeed/2);
+    delay(duration_delivery);
+    rotate_right(motorSpeed/2);
+    delay(duration_90degree*0.8);
+    updateLineSensors(850);
+    while (LineSensor2 == LOW){
+      updateLineSensors(850);
+      rotate_right(motorSpeed/2);
+    }
+    stop();
+}
+
+void blue_box()
+{
+    forwards(motorSpeed / 2);
+    delay(duration_delivery);
+    rotate_left(motorSpeed/2);
+    delay(duration_90degree);
+    stop();
+    delay(2000);
+    forwards(motorSpeed / 2);
+    delay(duration_delivery);
+    backwards(motorSpeed/2);
+    delay(duration_delivery);
+    rotate_left(motorSpeed/2);
+    delay(duration_90degree*0.8);
+    updateLineSensors(850);
+    while (LineSensor1 == LOW){
+      updateLineSensors(850);
+      rotate_left(motorSpeed/2);
+    }
+    stop();
 }

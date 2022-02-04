@@ -101,6 +101,11 @@ void loop()
     if (loopState == LOOP_STATE_STARTED)
     {
         /************************ MAIN PROGRAM STARTS HERE ************************/
+        
+        //left sensor state
+        int LineSensor1;
+        //right sensor state
+        int LineSensor2;
 
         updateLineSensors(850);  // reads line sensor analog data and assigns HIGH / LOW
         distance_cm = mySensor.getDistance();  // update distance sensor
@@ -402,10 +407,6 @@ void search() {
 
 /********************** LINE SENSOR UPDATE STATE ***************************/
 void updateLineSensors(int threshold = 850) {
-    //left sensor state
-    int LineSensor1;
-    //right sensor state
-    int LineSensor2;
 
     //sets left LineSensor1 to high if on tape, else Low
     if (analogRead(leftIn) >= threshold)

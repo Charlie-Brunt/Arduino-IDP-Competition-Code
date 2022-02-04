@@ -69,6 +69,10 @@ const int duration_delivery = 3000;
 const int bridgeDuration1 = 10000;
 long previousMillis;
 
+void updateLineSensors(int threshold = 850);
+void open_servo();
+void close_servo();
+
 void setup()
 {
     AFMS.begin();
@@ -77,7 +81,7 @@ void setup()
     pinMode(rightIn, INPUT);
     pinMode(coarseLEDpin, OUTPUT);
     pinMode(fineLEDpin, OUTPUT);
-    pinMode(distanceSensorPin, INPUT);
+    pinMode(IRPin, INPUT);
 
     button.setDebounceTime(20); // set debounce time to 50 milliseconds
 
@@ -106,11 +110,14 @@ void loop()
         /************************ MAIN PROGRAM STARTS HERE ************************/
 
         updateLineSensors(850);  // reads line sensor analog data and assigns HIGH / LOW
-        distance_cm = mySensor.getDistance();  // update distance sensor
+        distance_cm = mySensor.distance();  // update distance sensor
 
         // prevents line_follow and rotate180 conflicting
         if (IfRotate == true) {
         rotate180();
+        }
+        else if (Ifdeliver == true) {
+          deliver();
         }
         else {
             line_follow();
@@ -135,7 +142,7 @@ void backwards(int speed)
     motor2->setSpeed(speed);
     motor1->run(BACKWARD);
     motor2->run(BACKWARD);
-    motionLED():
+    motionLED();
 }
 
 void turn_right_forwards(int speed_high, int speed_low)
@@ -246,6 +253,7 @@ void red_box()
     }
     stop();
     carryingBlock = false;
+    Ifdeliver = false;
 }
 
 void blue_box()
@@ -269,6 +277,7 @@ void blue_box()
     }
     stop();
     carryingBlock = false;
+    Ifdeliver = false;
 }
 
 void deliver() {
@@ -298,14 +307,18 @@ void journeyLogic()
             break;
         case junction1:
             forwards(motorSpeed);
-            junctionCounter = deliverJunction;
-            long previousMillis = millis();  // bridge timer starts here
+            junctionCounter = junction2;
             delay(1500);
+            break;
+        case junction2:
+            stop();
+            IfRotate = true;
+            junctionCounter = deliverJunction;
             break;
         case deliverJunction:
             stop();
             delay(1500);
-            deliver();
+            Ifdeliver = true;
             junctionCounter = junction2;
             journeyCounter++;
             break;
@@ -318,7 +331,8 @@ void journeyLogic()
         case junction2:
             forwards(motorSpeed);
             junctionCounter = junction3;  // Virtual junction 2 for return journey
-            delay(1000);
+            delay(3000);
+            IfRotate = true;
             break;
         case junction3:
             forwards(motorSpeed);
@@ -328,7 +342,7 @@ void journeyLogic()
         case deliverJunction:
             stop();
             delay(1500);
-            deliver();
+            Ifdeliver = true;
             junctionCounter = junction2;
             journeyCounter++;
             break;
@@ -346,13 +360,19 @@ void journeyLogic()
         case junction3:
             stop();
             delay(1500);
-            search();
+            // search();
+            IfRotate = true;
+            junctionCounter = 5;
+            break;
+        case 5:
+            forwards(motorSpeed);
             junctionCounter = deliverJunction;
+            delay(1500);
             break;
         case deliverJunction:
             stop();
             delay(1500);
-            deliver();
+            Ifdeliver = true;
             delay(1000000); // Placeholder to end program
             break;
         }
@@ -387,12 +407,14 @@ void open_servo(){
   { 
     myservo.write(pos);
     delay(500);
+  }
 }
 void close_servo(){
   for (pos = servo_endangle; pos <= servo_startangle; pos -= 1)
   { 
     myservo.write(pos);
     delay(500);
+  }
 }
 
 /************************* SEARCH FUNCTION ***********************************/

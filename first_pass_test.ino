@@ -18,6 +18,9 @@ bool lfReverse = false;
 bool IsOffLine = false;
 bool IfRotate = false;
 
+int LineSensor1;
+int LineSensor2;
+
 // function definitions
 void forwards();
 void stop();
@@ -27,6 +30,7 @@ void turn_right_backwards();
 void turn_left_backwards();
 void rotate_left();
 void rotate_right();
+void updateLineSensors(int threshold = 850);
 
 void setup()
 {
@@ -41,33 +45,15 @@ void setup()
 }
 
 void loop()
-{
-    //left sensor state
-    int LineSensor1;
-    //right sensor state
-    int LineSensor2;
-
-    //sets left LineSensor1 to high if on tape, else Low
-    if(analogRead(leftIn)>=850){
-        LineSensor1 = HIGH;
-    }
-    else {
-        LineSensor1 = LOW;
-    }
-    //sets right LineSensor2 to high if on tape, else Low
-    if(analogRead(rightIn)>=850){
-        LineSensor2 = HIGH;
-    }
-    else {
-        LineSensor2 = LOW;
-    }    
+{    
+    updateLineSensors(850);
 
     if (IfRotate == true) {
-        rotate180(LineSensor1, LineSensor2);
+        rotate180();
     }
     else{
         Serial.println("line follow");
-        line_follow(LineSensor1,LineSensor2);
+        line_follow();
     }
 }
 
@@ -77,7 +63,6 @@ void forwards(int speed)
     motor2->setSpeed(speed);
     motor1->run(FORWARD);
     motor2->run(FORWARD);
-    motionLED();
 }
 
 void backwards(int speed)
@@ -86,7 +71,6 @@ void backwards(int speed)
     motor2->setSpeed(speed);
     motor1->run(BACKWARD);
     motor2->run(BACKWARD);
-    motionLED();
 }
 
 void turn_right_forwards(int speed_high, int speed_low)
@@ -95,7 +79,6 @@ void turn_right_forwards(int speed_high, int speed_low)
     motor2->setSpeed(speed_low);
     motor1->run(FORWARD);
     motor2->run(FORWARD);
-    motionLED();
 }
 
 void turn_left_forwards(int speed_high, int speed_low)
@@ -104,7 +87,6 @@ void turn_left_forwards(int speed_high, int speed_low)
     motor2->setSpeed(speed_high);
     motor1->run(FORWARD);
     motor2->run(FORWARD);
-    motionLED();
 }
 
 void turn_left_backwards(int speed_high, int speed_low)
@@ -113,7 +95,6 @@ void turn_left_backwards(int speed_high, int speed_low)
     motor2->setSpeed(speed_low);
     motor1->run(BACKWARD);
     motor2->run(BACKWARD);
-    motionLED();
 }
 
 void turn_right_backwards(int speed_high, int speed_low)
@@ -122,7 +103,6 @@ void turn_right_backwards(int speed_high, int speed_low)
     motor2->setSpeed(speed_high);
     motor1->run(BACKWARD);
     motor2->run(BACKWARD);
-    motionLED();
 }
 
 void rotate_right(int speed)
@@ -131,7 +111,6 @@ void rotate_right(int speed)
     motor2->setSpeed(speed);
     motor1->run(FORWARD);
     motor2->run(BACKWARD);
-    motionLED();
 }
 
 void rotate_left(int speed)
@@ -140,7 +119,6 @@ void rotate_left(int speed)
     motor2->setSpeed(speed);
     motor1->run(BACKWARD);
     motor2->run(FORWARD);
-    motionLED();
 }
 
 void stop()
@@ -153,7 +131,7 @@ void stop()
 
 }
 /******************************** 180 TURN ********************************/
-void rotate180(int LineSensor1, int LineSensor2)
+void rotate180()
 {
     if (IsOffLine == false)
     {
@@ -176,7 +154,7 @@ void rotate180(int LineSensor1, int LineSensor2)
     }
 }
 /******************************** LINE FOLLOWING ALGORITHM ********************************/
-void line_follow(int LineSensor1,int LineSensor2)
+void line_follow()
 {
     if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
     {
@@ -216,15 +194,24 @@ void line_follow(int LineSensor1,int LineSensor2)
         }
     }
 }
-/******************** INDICATOR LEDS *********************/
-void toggleCoarseLED() {
-    digitalWrite(coarseLEDpin, !digitalRead(coarseLEDpin));
-}
-
-void toggleFineLED() {
-    digitalWrite(fineLEDpin, !digitalRead(fineLEDpin));
-}
-
-void motionLED() {
-    digitalWrite(motionLEDpin, HIGH);
+/********************** LINE SENSOR UPDATE STATE ***************************/
+void updateLineSensors(int threshold = 850) {
+    //sets left LineSensor1 to high if on tape, else Low
+    if (analogRead(leftIn) >= threshold)
+    {
+        LineSensor1 = HIGH;
+    }
+    else
+    {
+        LineSensor1 = LOW;
+    }
+    //sets right LineSensor2 to high if on tape, else Low
+    if (analogRead(rightIn) >= threshold)
+    {
+        LineSensor2 = HIGH;
+    }
+    else
+    {
+        LineSensor2 = LOW;
+    }    
 }

@@ -14,8 +14,8 @@ Adafruit_DCMotor *motor2 = AFMS.getMotor(2);
 
 //Parameters
 const float motorSpeed = 255; // Adjust motor speed here
-const int duration_90degree = 6000;
-const int duration_delivery = 3000;
+const int duration_90degree = 3500;
+const int duration_delivery = 2000;
 
 ezButton button(pushButtonPin);  // create ezButton object that attach to pin 7;
 int loopState = LOOP_STATE_STOPPED;

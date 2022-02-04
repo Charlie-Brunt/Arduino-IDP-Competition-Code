@@ -38,6 +38,9 @@ int loopState = LOOP_STATE_STOPPED;
 SharpIR mySensor = SharpIR(IRPin, model);
 int distance_cm;
 
+int LineSensor1;
+int LineSensor2;
+
 // Flags, state variables
 int junctionCounter = 0;
 #define startJunction 0   // for passing out of start box
@@ -202,7 +205,7 @@ void rotate180(int LineSensor1, int LineSensor2)
     }
 }
 /******************************** LINE FOLLOWING ALGORITHM ********************************/
-void line_follow(int LineSensor1, int LineSensor2)
+void line_follow()
 {
     if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
     {
@@ -387,11 +390,6 @@ void search() {
 
 /********************** LINE SENSOR UPDATE STATE ***************************/
 void updateLineSensors(int threshold = 850) {
-    //left sensor state
-    int LineSensor1;
-    //right sensor state
-    int LineSensor2;
-
     //sets left LineSensor1 to high if on tape, else Low
     if (analogRead(leftIn) >= threshold)
     {

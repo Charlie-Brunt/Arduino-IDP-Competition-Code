@@ -112,10 +112,10 @@ void loop()
 
         // prevents line_follow and rotate180 conflicting
         if (IfRotate == true) {
-        rotate180(LineSensor1, LineSensor2);
+            rotate180();
         }
         else {
-            line_follow(LineSensor1, LineSensor2);
+            line_follow();
         }
 
         /* Turn on IR if certain conditions are met e.g. clear of the ramp or 
@@ -200,7 +200,7 @@ void stop()
     digitalWrite(motionLEDpin, LOW);
 }
 /******************************** 180 TURN ********************************/
-void rotate180(int LineSensor1, int LineSensor2)
+void rotate180()
 {
     if (IsOffLine == false)
     {
@@ -222,7 +222,7 @@ void rotate180(int LineSensor1, int LineSensor2)
     }
 }
 /******************************** LINE FOLLOWING ALGORITHM ********************************/
-void line_follow(int LineSensor1, int LineSensor2)
+void line_follow()
 {
     if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
     {

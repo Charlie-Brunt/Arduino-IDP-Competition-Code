@@ -77,6 +77,7 @@ void forwards(int speed)
     motor2->setSpeed(speed);
     motor1->run(FORWARD);
     motor2->run(FORWARD);
+    motionLED();
 }
 
 void backwards(int speed)
@@ -85,6 +86,7 @@ void backwards(int speed)
     motor2->setSpeed(speed);
     motor1->run(BACKWARD);
     motor2->run(BACKWARD);
+    motionLED();
 }
 
 void turn_right_forwards(int speed_high, int speed_low)
@@ -93,6 +95,7 @@ void turn_right_forwards(int speed_high, int speed_low)
     motor2->setSpeed(speed_low);
     motor1->run(FORWARD);
     motor2->run(FORWARD);
+    motionLED();
 }
 
 void turn_left_forwards(int speed_high, int speed_low)
@@ -101,6 +104,7 @@ void turn_left_forwards(int speed_high, int speed_low)
     motor2->setSpeed(speed_high);
     motor1->run(FORWARD);
     motor2->run(FORWARD);
+    motionLED();
 }
 
 void turn_left_backwards(int speed_high, int speed_low)
@@ -109,6 +113,7 @@ void turn_left_backwards(int speed_high, int speed_low)
     motor2->setSpeed(speed_low);
     motor1->run(BACKWARD);
     motor2->run(BACKWARD);
+    motionLED();
 }
 
 void turn_right_backwards(int speed_high, int speed_low)
@@ -117,6 +122,7 @@ void turn_right_backwards(int speed_high, int speed_low)
     motor2->setSpeed(speed_high);
     motor1->run(BACKWARD);
     motor2->run(BACKWARD);
+    motionLED();
 }
 
 void rotate_right(int speed)
@@ -125,6 +131,7 @@ void rotate_right(int speed)
     motor2->setSpeed(speed);
     motor1->run(FORWARD);
     motor2->run(BACKWARD);
+    motionLED();
 }
 
 void rotate_left(int speed)
@@ -133,6 +140,7 @@ void rotate_left(int speed)
     motor2->setSpeed(speed);
     motor1->run(BACKWARD);
     motor2->run(FORWARD);
+    motionLED();
 }
 
 void stop()
@@ -141,6 +149,8 @@ void stop()
     motor2->setSpeed(0);
     motor1->run(RELEASE);
     motor2->run(RELEASE);
+    digitalWrite(motionLEDpin, LOW);
+
 }
 /******************************** 180 TURN ********************************/
 void rotate180(int LineSensor1, int LineSensor2)
@@ -205,4 +215,16 @@ void line_follow(int LineSensor1,int LineSensor2)
             break;
         }
     }
+}
+/******************** INDICATOR LEDS *********************/
+void toggleCoarseLED() {
+    digitalWrite(coarseLEDpin, !digitalRead(coarseLEDpin));
+}
+
+void toggleFineLED() {
+    digitalWrite(fineLEDpin, !digitalRead(fineLEDpin));
+}
+
+void motionLED() {
+    digitalWrite(motionLEDpin, HIGH);
 }

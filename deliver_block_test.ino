@@ -110,10 +110,10 @@ void loop()
 
         // prevents line_follow and rotate180 conflicting
         if (IfRotate == true) {
-        rotate180(LineSensor1, LineSensor2);
+        rotate180();
         }
         else {
-            line_follow(LineSensor1, LineSensor2);
+            line_follow();
         }
     }
 }
@@ -183,7 +183,7 @@ void stop()
     digitalWrite(motionLEDpin, LOW);
 }
 /******************************** 180 TURN ********************************/
-void rotate180(int LineSensor1, int LineSensor2)
+void rotate180()
 {
     if (IsOffLine == false)
     {

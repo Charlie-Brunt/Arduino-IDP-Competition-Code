@@ -395,7 +395,7 @@ void red_box()
     rotate_right(motorSpeed/2);
     delay(duration_90degree);
     stop();
-    delay(2000);
+    delay(1000);
     forwards(motorSpeed / 2);
     delay(duration_delivery);
     stop();
@@ -422,7 +422,7 @@ void blue_box()
     rotate_left(motorSpeed/2);
     delay(duration_90degree);
     stop();
-    delay(2000);
+    delay(1000);
     forwards(motorSpeed / 2);
     delay(duration_delivery);
     stop();

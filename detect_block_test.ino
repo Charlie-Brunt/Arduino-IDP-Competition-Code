@@ -62,7 +62,7 @@ bool IfCoarse = false;
 bool IfRotate = false;
 bool IsOffLine = false;
 bool Ifdeliver = false;
-bool carryingBlock = false;
+bool carryingBlock = true;
 bool Ifdetected = false;
 
 //Parameters
@@ -70,7 +70,7 @@ const float motorSpeed = 255; // Adjust motor speed here
 const int duration_90degree = 3500;
 const int duration_delivery = 2000;
 const int duration_1 = 10000;
-const int duration_2 = 10000;
+const int duration_2 = 5000;
 long previousMillis;
 
 // function definitions
@@ -88,6 +88,10 @@ void close_servo();
 void open_servo();
 void journeyLogic();
 void search();
+void toggleCoarseLED();
+void toggleFineLED();
+void motionLED();
+void blue_box();
 
 void setup()
 {
@@ -95,9 +99,11 @@ void setup()
     pinMode(motionLEDpin, OUTPUT);
     pinMode(leftIn, INPUT);
     pinMode(rightIn, INPUT);
-
+    pinMode(IRindicator, OUTPUT);
+    myservo.attach(10);
     Serial.begin(9600);
     Serial.println("Ready!");
+    open_servo();
     delay(3000);
 }
 
@@ -118,14 +124,14 @@ void loop()
     {
         /************************ MAIN PROGRAM STARTS HERE ************************/
         updateLineSensors(850);
-        distance_cm = mySensor.getDistance();
+        distance_cm = mySensor.distance();
 
 
         // Turn on IR sensor if certain conditions are met
         if (carryingBlock == false)
         {
             unsigned long currentMillis = millis();
-            if (journeyCounter == journey1)
+            if ((journeyCounter == journey1) && (junctionCounter == deliverJunction))
             {
                 if (currentMillis - previousMillis > duration_1)
                 {
@@ -146,6 +152,9 @@ void loop()
                     collectIfInRange();
                 }
             }
+        } 
+        else {
+          digitalWrite(IRindicator, LOW);
         }
 
         if (IfRotate == true) {
@@ -164,6 +173,7 @@ void forwards(int speed)
     motor2->setSpeed(speed);
     motor1->run(FORWARD);
     motor2->run(FORWARD);
+    motionLED();
 }
 
 void backwards(int speed)
@@ -172,6 +182,7 @@ void backwards(int speed)
     motor2->setSpeed(speed);
     motor1->run(BACKWARD);
     motor2->run(BACKWARD);
+    motionLED();
 }
 
 void turn_right_forwards(int speed_high, int speed_low)
@@ -180,6 +191,7 @@ void turn_right_forwards(int speed_high, int speed_low)
     motor2->setSpeed(speed_low);
     motor1->run(FORWARD);
     motor2->run(FORWARD);
+    motionLED();
 }
 
 void turn_left_forwards(int speed_high, int speed_low)
@@ -188,6 +200,7 @@ void turn_left_forwards(int speed_high, int speed_low)
     motor2->setSpeed(speed_high);
     motor1->run(FORWARD);
     motor2->run(FORWARD);
+    motionLED();
 }
 
 void turn_left_backwards(int speed_high, int speed_low)
@@ -196,6 +209,7 @@ void turn_left_backwards(int speed_high, int speed_low)
     motor2->setSpeed(speed_low);
     motor1->run(BACKWARD);
     motor2->run(BACKWARD);
+    motionLED();
 }
 
 void turn_right_backwards(int speed_high, int speed_low)
@@ -204,6 +218,7 @@ void turn_right_backwards(int speed_high, int speed_low)
     motor2->setSpeed(speed_high);
     motor1->run(BACKWARD);
     motor2->run(BACKWARD);
+    motionLED();
 }
 
 void rotate_right(int speed)
@@ -212,6 +227,7 @@ void rotate_right(int speed)
     motor2->setSpeed(speed);
     motor1->run(FORWARD);
     motor2->run(BACKWARD);
+    motionLED();
 }
 
 void rotate_left(int speed)
@@ -220,6 +236,7 @@ void rotate_left(int speed)
     motor2->setSpeed(speed);
     motor1->run(BACKWARD);
     motor2->run(FORWARD);
+    motionLED();
 }
 
 void stop()
@@ -281,6 +298,7 @@ void line_follow()
         case 1:
             forwards(motorSpeed);
             junctionCounter = deliverJunction;
+            carryingBlock = false;
             long previousMillis = millis();
             delay(1500);
             break;
@@ -340,7 +358,7 @@ void journeyLogic()
             blue_box();
             junctionCounter = junction2;
             break;
-
+        }
     case journey3:
         switch (junctionCounter)
         {
@@ -359,9 +377,8 @@ void journeyLogic()
             blue_box();
             delay(1000000);
             break;
-        
+        }
     }
-
 }
 
 
@@ -472,4 +489,17 @@ void close_servo() {
 /************************* SEARCH FUNCTION ***********************************/
 void search() {
 
+}
+
+/******************** INDICATOR LEDS *********************/
+void toggleCoarseLED() {
+    digitalWrite(coarseLEDpin, !digitalRead(coarseLEDpin));
+}
+
+void toggleFineLED() {
+    digitalWrite(fineLEDpin, !digitalRead(fineLEDpin));
+}
+
+void motionLED() {
+    digitalWrite(motionLEDpin, HIGH);
 }

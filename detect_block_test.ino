@@ -96,7 +96,10 @@ void setup()
 void loop()
 {    
     updateLineSensors(850);
-
+    distance_cm = mySensor.getDistance();
+    if (currentMillis - previousMillis > bridgeDuration1) {
+            checkDistance();
+    }
     if (IfRotate == true) {
         rotate180();
     }
@@ -228,15 +231,12 @@ void line_follow()
             break;
         case 1:
             forwards(motorSpeed);
-            junctionCounter++;
+            junctionCounter = deliverJunction;
+            long previousMillis = millis();
             delay(1500);
             break;
-        case 2:
-            stop();
-            IfRotate = true;
-            junctionCounter++;
-            break;
-        case 3:
+
+        case deliverJunction:
             stop();
             blue_box();
             junctionCounter = 2;
@@ -308,4 +308,11 @@ void blue_box()
       rotate_left(motorSpeed/2);
     }
     stop();
+}
+
+void checkDistance() {
+    if (distance_cm <= 10) {
+        stop();
+        delay(100000);
+    }
 }

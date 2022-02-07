@@ -65,10 +65,21 @@ bool Ifdetected = false;
 
 //Parameters
 const float motorSpeed = 255; // Adjust motor speed here
-const int duration_90degree = 6000;
-const int duration_delivery = 3000;
+const int duration_90degree = 3500;
+const int duration_delivery = 2000;
 const int bridgeDuration1 = 10000;
 long previousMillis;
+
+// function definitions
+void forwards();
+void stop();
+void turn_right_forwards();
+void turn_left_forwards();
+void turn_right_backwards();
+void turn_left_backwards();
+void rotate_left();
+void rotate_right();
+void updateLineSensors(int threshold = 850);
 
 void setup()
 {

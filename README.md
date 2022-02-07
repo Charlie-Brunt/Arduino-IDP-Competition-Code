@@ -33,7 +33,7 @@ Arduino Uno Wifi Rev 2 code for "The Thing" including test programs for testing 
 
 - **check_distance** - logic for checking distance for each journey
 - **deliver_test** - calibration for delivering blocks (COMPLETE)
-- **IR_sensor_test** - serial write distance readings from IR sensor#
+- **IR_sensor_test** - serial write distance readings from IR sensor
 - **line_follower_test** - test for basic line following
 - **motion_serial_test** - send serial commands to control motion
 - **motion_test** - all motion functions

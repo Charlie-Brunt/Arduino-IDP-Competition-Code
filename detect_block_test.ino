@@ -16,6 +16,7 @@
 #define motionLEDpin 13
 #define IRPin A2
 #define model 1080
+#define IRindicator 5
 
 // Motor setup
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
@@ -67,7 +68,8 @@ bool Ifdetected = false;
 const float motorSpeed = 255; // Adjust motor speed here
 const int duration_90degree = 3500;
 const int duration_delivery = 2000;
-const int bridgeDuration1 = 10000;
+const int duration_1 = 10000;
+const int duration_2 = 10000;
 long previousMillis;
 
 // function definitions
@@ -80,6 +82,9 @@ void turn_left_backwards();
 void rotate_left();
 void rotate_right();
 void updateLineSensors(int threshold = 850);
+void collectIfInRange();
+void close_servo();
+void open_servo();
 
 void setup()
 {
@@ -97,9 +102,34 @@ void loop()
 {    
     updateLineSensors(850);
     distance_cm = mySensor.getDistance();
-    if (currentMillis - previousMillis > bridgeDuration1) {
-            checkDistance();
+
+
+    // Turn on IR sensor if certain conditions are met
+    if (carryingBlock == false)
+    {
+        if (journeyCounter == journey1)
+        {
+            if (currentMillis - previousMillis > duration_1)
+            {
+                collectIfInRange();
+            }
+        }
+        else if (journeyCounter == journey2)
+        {
+            if (currentMillis - previousMillis > duration_2)
+            {
+                collectIfInRange();
+            }
+        }
+        else if (journeyCounter == journey3)
+        {
+            if (junctionCounter == junction3)
+            {
+                collectIfInRange();
+            }
+        }
     }
+
     if (IfRotate == true) {
         rotate180();
     }
@@ -286,6 +316,8 @@ void red_box()
       rotate_right(motorSpeed/2);
     }
     stop();
+    carryingBlock = false;
+    previousMillis = millis();
 }
 
 void blue_box()
@@ -308,11 +340,31 @@ void blue_box()
       rotate_left(motorSpeed/2);
     }
     stop();
+    carryingBlock = false;
+    previousMillis = millis();
 }
-
-void checkDistance() {
+/************************ DETECTION ***************************/
+void collectIfInRange() {
+    digitalWrite(IRindicator, HIGH);
     if (distance_cm <= 10) {
         stop();
-        delay(100000);
+        delay(1000);
+        close_servo();
+        carryingBlock = true;
+        IfRotate = true;
     }
+}
+
+/********************** SERVO ********************************/
+void open_servo(){
+  for (pos = servo_startangle; pos <= servo_endangle; pos += 1)
+  { 
+    myservo.write(pos);
+    delay(500);
+}
+void close_servo(){
+  for (pos = servo_endangle; pos <= servo_startangle; pos -= 1)
+  { 
+    myservo.write(pos);
+    delay(500);
 }

@@ -398,6 +398,9 @@ void red_box()
     delay(2000);
     forwards(motorSpeed / 2);
     delay(duration_delivery);
+    stop();
+    delay(1000);
+    open_servo();
     backwards(motorSpeed/2);
     delay(duration_delivery);
     rotate_right(motorSpeed/2);
@@ -422,6 +425,9 @@ void blue_box()
     delay(2000);
     forwards(motorSpeed / 2);
     delay(duration_delivery);
+    stop();
+    delay(1000);
+    open_servo();
     backwards(motorSpeed/2);
     delay(duration_delivery);
     rotate_left(motorSpeed/2);
@@ -452,15 +458,17 @@ void open_servo(){
   for (pos = servo_startangle; pos <= servo_endangle; pos += 1)
   { 
     myservo.write(pos);
-    delay(500);
+    delay(15);
   }
+  delay(1000);
 }
 void close_servo(){
   for (pos = servo_endangle; pos <= servo_startangle; pos -= 1)
   { 
     myservo.write(pos);
-    delay(500);
+    delay(15);
   }
+  delay(1000);
 }
 
 /************************* SEARCH FUNCTION ***********************************/

@@ -90,6 +90,7 @@ void setup()
     pinMode(coarseLEDpin, OUTPUT);
     pinMode(fineLEDpin, OUTPUT);
     pinMode(distanceSensorPin, INPUT);
+    myservo.attach(9);
 
     button.setDebounceTime(20); // set debounce time to 50 milliseconds
 

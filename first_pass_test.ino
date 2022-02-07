@@ -298,6 +298,8 @@ void blue_box()
     delay(2000);
     forwards(motorSpeed / 2);
     delay(duration_delivery);
+    stop();
+    delay(1000);
     backwards(motorSpeed/2);
     delay(duration_delivery);
     rotate_left(motorSpeed/2);

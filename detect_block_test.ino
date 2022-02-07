@@ -88,60 +88,9 @@ void close_servo();
 void open_servo();
 void journeyLogic();
 void search();
-void toggleCoarseLED();
-void toggleFineLED();
-void motionLED();
-void blue_box();
-
-void setup()
-{
-    AFMS.begin();
-    pinMode(motionLEDpin, OUTPUT);
-    pinMode(leftIn, INPUT);
-    pinMode(rightIn, INPUT);
-    pinMode(IRindicator, OUTPUT);
-    myservo.attach(10);
-    Serial.begin(9600);
-    Serial.println("Ready!");
-    open_servo();
-    delay(3000);
-}
-
-void loop()
-{   
-    // Push button start/stop
-    button.loop();
-
-    if (button.isPressed())
-    {
-        if (loopState == LOOP_STATE_STOPPED)
-            loopState = LOOP_STATE_STARTED;
-        else // if(loopState == LOOP_STATE_STARTED)
-            loopState = LOOP_STATE_STOPPED;
-    }
-
-    if (loopState == LOOP_STATE_STARTED)
-    {
-        /************************ MAIN PROGRAM STARTS HERE ************************/
-        updateLineSensors(850);
-        distance_cm = mySensor.distance();
-
-
-        // Turn on IR sensor if certain conditions are met
-        if (carryingBlock == false)
-        {
-            unsigned long currentMillis = millis();
-            if ((journeyCounter == journey1) && (junctionCounter == deliverJunction))
-            {
                 if (currentMillis - previousMillis > duration_1)
-                {
-                    collectIfInRange();
                 }
-            }
-            else if (journeyCounter == journey2)
             {
-                if (currentMillis - previousMillis > duration_2)
-                {
                     collectIfInRange();
                 }
             }

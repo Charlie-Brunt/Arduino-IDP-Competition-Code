@@ -99,43 +99,58 @@ void setup()
 }
 
 void loop()
-{    
-    updateLineSensors(850);
-    distance_cm = mySensor.getDistance();
+{   
+    // Push button start/stop
+    button.loop();
 
-
-    // Turn on IR sensor if certain conditions are met
-    if (carryingBlock == false)
+    if (button.isPressed())
     {
-        if (journeyCounter == journey1)
-        {
-            if (currentMillis - previousMillis > duration_1)
-            {
-                collectIfInRange();
-            }
-        }
-        else if (journeyCounter == journey2)
-        {
-            if (currentMillis - previousMillis > duration_2)
-            {
-                collectIfInRange();
-            }
-        }
-        else if (journeyCounter == journey3)
-        {
-            if (junctionCounter == junction3)
-            {
-                collectIfInRange();
-            }
-        }
+        if (loopState == LOOP_STATE_STOPPED)
+            loopState = LOOP_STATE_STARTED;
+        else // if(loopState == LOOP_STATE_STARTED)
+            loopState = LOOP_STATE_STOPPED;
     }
 
-    if (IfRotate == true) {
-        rotate180();
-    }
-    else{
-        Serial.println("line follow");
-        line_follow();
+    if (loopState == LOOP_STATE_STARTED)
+    {
+        /************************ MAIN PROGRAM STARTS HERE ************************/
+        updateLineSensors(850);
+        distance_cm = mySensor.getDistance();
+
+
+        // Turn on IR sensor if certain conditions are met
+        if (carryingBlock == false)
+        {
+            if (journeyCounter == journey1)
+            {
+                if (currentMillis - previousMillis > duration_1)
+                {
+                    collectIfInRange();
+                }
+            }
+            else if (journeyCounter == journey2)
+            {
+                if (currentMillis - previousMillis > duration_2)
+                {
+                    collectIfInRange();
+                }
+            }
+            else if (journeyCounter == journey3)
+            {
+                if (junctionCounter == junction3)
+                {
+                    collectIfInRange();
+                }
+            }
+        }
+
+        if (IfRotate == true) {
+            rotate180();
+        }
+        else{
+            line_follow();
+        }
+
     }
 }
 

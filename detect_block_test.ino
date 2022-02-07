@@ -6,8 +6,8 @@
 #include <Servo.h>
 
 // Pin assignments
-#define leftIn A0  // left IR sensor
-#define rightIn A1 // right IR sensor
+#define leftIn A0    // left IR sensor
+#define rightIn A1   // right IR sensor
 #define echoPin 2    // ultrasonic sensor I
 #define triggerPin 3 // ultrasonic sensor II
 #define coarseLEDpin 1
@@ -32,7 +32,7 @@ const int servo_endangle = 70;
 // Push button setup
 #define LOOP_STATE_STOPPED 0
 #define LOOP_STATE_STARTED 1
-ezButton button(pushButtonPin);  // create ezButton object that attach to pin 7
+ezButton button(pushButtonPin); // create ezButton object that attach to pin 7
 int loopState = LOOP_STATE_STOPPED;
 
 // IR sensor setup
@@ -62,16 +62,17 @@ bool IfCoarse = false;
 bool IfRotate = false;
 bool IsOffLine = false;
 bool Ifdeliver = false;
-bool carryingBlock = true;
+bool carryingBlock = false;
 bool Ifdetected = false;
 
-//Parameters
+// Parameters
 const float motorSpeed = 255; // Adjust motor speed here
 const int duration_90degree = 3500;
 const int duration_delivery = 2000;
-const int duration_1 = 10000;
+const int duration_1 = 10750;
 const int duration_2 = 5000;
-long previousMillis;
+unsigned long previousMillis;
+const int IRthreshold = 950;
 
 // function definitions
 void forwards();
@@ -82,7 +83,7 @@ void turn_right_backwards();
 void turn_left_backwards();
 void rotate_left();
 void rotate_right();
-void updateLineSensors(int threshold = 850);
+void updateLineSensors(int threshold = 950);
 void collectIfInRange();
 void close_servo();
 void open_servo();
@@ -92,6 +93,7 @@ void toggleCoarseLED();
 void toggleFineLED();
 void motionLED();
 void blue_box();
+void red_box();
 
 void setup()
 {
@@ -100,6 +102,8 @@ void setup()
     pinMode(leftIn, INPUT);
     pinMode(rightIn, INPUT);
     pinMode(IRindicator, OUTPUT);
+    pinMode(coarseLEDpin, OUTPUT);
+    pinMode(fineLEDpin, OUTPUT);
     myservo.attach(10);
     Serial.begin(9600);
     Serial.println("Ready!");
@@ -108,7 +112,7 @@ void setup()
 }
 
 void loop()
-{   
+{
     // Push button start/stop
     button.loop();
 
@@ -123,15 +127,23 @@ void loop()
     if (loopState == LOOP_STATE_STARTED)
     {
         /************************ MAIN PROGRAM STARTS HERE ************************/
-        updateLineSensors(850);
+        updateLineSensors(IRthreshold);
         distance_cm = mySensor.distance();
+        unsigned long currentMillis = millis();
 
+        if (IfRotate == true)
+        {
+            rotate180();
+        }
+        else
+        {
+            line_follow();
+        }
 
         // Turn on IR sensor if certain conditions are met
         if (carryingBlock == false)
         {
-            unsigned long currentMillis = millis();
-            if ((journeyCounter == journey1) && (junctionCounter == deliverJunction))
+            if (journeyCounter == journey1)
             {
                 if (currentMillis - previousMillis > duration_1)
                 {
@@ -152,17 +164,12 @@ void loop()
                     collectIfInRange();
                 }
             }
-        } 
-        else {
-          digitalWrite(IRindicator, LOW);
+        }
+        else
+        {
+            digitalWrite(IRindicator, LOW);
         }
 
-        if (IfRotate == true) {
-            rotate180();
-        }
-        else{
-            line_follow();
-        }
 
     }
 }
@@ -246,7 +253,6 @@ void stop()
     motor1->run(RELEASE);
     motor2->run(RELEASE);
     digitalWrite(motionLEDpin, LOW);
-
 }
 /******************************** 180 TURN ********************************/
 void rotate180()
@@ -267,7 +273,7 @@ void rotate180()
         {
             stop();
             IsOffLine = false;
-            IfRotate=false;
+            IfRotate = false;
         }
     }
 }
@@ -291,16 +297,16 @@ void line_follow()
         switch (junctionCounter)
         {
         case 0:
+            
             forwards(motorSpeed);
             junctionCounter++;
-            delay(1500);
+            delay(1200);
             break;
         case 1:
             forwards(motorSpeed);
             junctionCounter = deliverJunction;
-            carryingBlock = false;
-            long previousMillis = millis();
-            delay(1500);
+            previousMillis = millis();
+            delay(1200);
             break;
 
         case deliverJunction:
@@ -381,11 +387,10 @@ void journeyLogic()
     }
 }
 
-
-
 /********************** LINE SENSOR UPDATE STATE ***************************/
-void updateLineSensors(int threshold = 850) {
-    //sets left LineSensor1 to high if on tape, else Low
+void updateLineSensors(int threshold = 950)
+{
+    // sets left LineSensor1 to high if on tape, else Low
     if (analogRead(leftIn) >= threshold)
     {
         LineSensor1 = HIGH;
@@ -394,7 +399,7 @@ void updateLineSensors(int threshold = 850) {
     {
         LineSensor1 = LOW;
     }
-    //sets right LineSensor2 to high if on tape, else Low
+    // sets right LineSensor2 to high if on tape, else Low
     if (analogRead(rightIn) >= threshold)
     {
         LineSensor2 = HIGH;
@@ -402,14 +407,14 @@ void updateLineSensors(int threshold = 850) {
     else
     {
         LineSensor2 = LOW;
-    }    
+    }
 }
 
 void red_box()
 {
     forwards(motorSpeed / 2);
     delay(duration_delivery);
-    rotate_right(motorSpeed/2);
+    rotate_right(motorSpeed / 2);
     delay(duration_90degree);
     stop();
     delay(1000);
@@ -418,14 +423,15 @@ void red_box()
     stop();
     delay(1000);
     open_servo();
-    backwards(motorSpeed/2);
+    backwards(motorSpeed / 2);
     delay(duration_delivery);
-    rotate_right(motorSpeed/2);
-    delay(duration_90degree*0.8);
-    updateLineSensors(850);
-    while (LineSensor2 == LOW){
-      updateLineSensors(850);
-      rotate_right(motorSpeed/2);
+    rotate_right(motorSpeed / 2);
+    delay(duration_90degree);
+    updateLineSensors(IRthreshold);
+    while (LineSensor2 == LOW)
+    {
+        updateLineSensors(IRthreshold);
+        rotate_right(motorSpeed / 2);
     }
     stop();
     carryingBlock = false;
@@ -436,7 +442,7 @@ void blue_box()
 {
     forwards(motorSpeed / 2);
     delay(duration_delivery);
-    rotate_left(motorSpeed/2);
+    rotate_left(motorSpeed / 2);
     delay(duration_90degree);
     stop();
     delay(1000);
@@ -445,61 +451,71 @@ void blue_box()
     stop();
     delay(1000);
     open_servo();
-    backwards(motorSpeed/2);
+    backwards(motorSpeed / 2);
     delay(duration_delivery);
-    rotate_left(motorSpeed/2);
-    delay(duration_90degree*0.8);
-    updateLineSensors(850);
-    while (LineSensor1 == LOW){
-      updateLineSensors(850);
-      rotate_left(motorSpeed/2);
+    rotate_left(motorSpeed / 2);
+    delay(duration_90degree);
+    updateLineSensors(IRthreshold);
+    while (LineSensor1 == LOW)
+    {
+        updateLineSensors(IRthreshold);
+        rotate_left(motorSpeed / 2);
     }
     stop();
     carryingBlock = false;
     previousMillis = millis();
 }
 /************************ DETECTION ***************************/
-void collectIfInRange() {
+void collectIfInRange()
+{
     digitalWrite(IRindicator, HIGH);
-    if (distance_cm <= 10) {
+    if (distance_cm <= 10)
+    {
         stop();
         delay(1000);
         close_servo();
         carryingBlock = true;
+        forwards(motorSpeed);
+        delay(500);
         IfRotate = true;
     }
 }
 
 /********************** SERVO ********************************/
-void open_servo(){
-  for (pos = servo_startangle; pos <= servo_endangle; pos += 1)
-  { 
-    myservo.write(pos);
-    delay(15);
-  }
+void open_servo()
+{
+    for (pos = servo_startangle; pos <= servo_endangle; pos += 1)
+    {
+        myservo.write(pos);
+        delay(15);
+    }
 }
-void close_servo() {
-  for (pos = servo_endangle; pos >= servo_startangle; pos -= 1)
-  { 
-    myservo.write(pos);
-    delay(15);
-  }
+void close_servo()
+{
+    for (pos = servo_endangle; pos >= servo_startangle; pos -= 1)
+    {
+        myservo.write(pos);
+        delay(15);
+    }
 }
 
 /************************* SEARCH FUNCTION ***********************************/
-void search() {
-
+void search()
+{
 }
 
 /******************** INDICATOR LEDS *********************/
-void toggleCoarseLED() {
+void toggleCoarseLED()
+{
     digitalWrite(coarseLEDpin, !digitalRead(coarseLEDpin));
 }
 
-void toggleFineLED() {
+void toggleFineLED()
+{
     digitalWrite(fineLEDpin, !digitalRead(fineLEDpin));
 }
 
-void motionLED() {
+void motionLED()
+{
     digitalWrite(motionLEDpin, HIGH);
 }

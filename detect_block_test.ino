@@ -377,10 +377,12 @@ void open_servo(){
   { 
     myservo.write(pos);
     delay(500);
+  }
 }
 void close_servo(){
   for (pos = servo_endangle; pos <= servo_startangle; pos -= 1)
   { 
     myservo.write(pos);
     delay(500);
+  }
 }

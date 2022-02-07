@@ -17,7 +17,11 @@ Arduino Uno Wifi Rev 2 code for "The Thing" including test programs for testing 
 - [x] Introduce decision-based LED signals and movement LED
 - [x] Write servo actuation code
 - [x] Write block detection code
-- [ ] Update deliver_block_test with main code
+- [x] Fix deliver_block_test for first pass using timer 
+- [x] Integrate all modules to date
+- [ ] Optimise and improve consistency of deliver_block_test
+    - [ ] 1st pass: could turn on IR when junction2 reached and reverse until within distance to grab block
+    - [ ] 2nd pass: same approach as above but instead line follow
 - [ ] Write block identification code
 - [ ] Write third pass search, store, fetch algorithm
 - [ ] Call functions from .cpp and .h files

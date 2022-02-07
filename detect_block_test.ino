@@ -51,6 +51,7 @@ int junctionCounter = 0;
 #define junction3 3       // for when reaching end search zone
 #define deliverJunction 4 // for when delivering at deliver junction
 #define endJunction 5     // for passing into start box
+#define junction2return 6
 
 int journeyCounter = 1;
 #define journey1 1
@@ -85,6 +86,8 @@ void updateLineSensors(int threshold = 850);
 void collectIfInRange();
 void close_servo();
 void open_servo();
+void journeyLogic();
+void search();
 
 void setup()
 {
@@ -290,6 +293,79 @@ void line_follow()
         }
     }
 }
+
+/*********************** JOURNEY LOGIC ***********************/
+
+void journeyLogic()
+{
+    switch (journeyCounter)
+    {
+    case journey1:
+        switch (junctionCounter)
+        {
+        case startJunction:
+            forwards(motorSpeed);
+            junctionCounter++;
+            delay(1500);
+            break;
+        case junction1:
+            forwards(motorSpeed);
+            junctionCounter = deliverJunction;
+            long previousMillis = millis();
+            delay(1500);
+            break;
+
+        case deliverJunction:
+            stop();
+            blue_box();
+            junctionCounter = junction2;
+            break;
+        }
+
+    case journey2:
+        switch (junctionCounter)
+        {
+        case junction2:
+            forwards(motorSpeed);
+            delay(1000);
+            junctionCounter = junction2return;
+            break;
+        case junction2return:
+            forwards(motorSpeed);
+            delay(1000);
+            junctionCounter = deliverJunction;
+            break;
+        case deliverJunction:
+            stop();
+            blue_box();
+            junctionCounter = junction2;
+            break;
+
+    case journey3:
+        switch (junctionCounter)
+        {
+        case junction2:
+            forwards(motorSpeed);
+            delay(1000);
+            junctionCounter = junction3;
+            break;
+        case junction3:
+            stop();
+            search();
+            junctionCounter = deliverJunction;
+            break;
+        case deliverJunction:
+            stop();
+            blue_box();
+            delay(1000000);
+            break;
+        
+    }
+
+}
+
+
+
 /********************** LINE SENSOR UPDATE STATE ***************************/
 void updateLineSensors(int threshold = 850) {
     //sets left LineSensor1 to high if on tape, else Low
@@ -319,7 +395,7 @@ void red_box()
     rotate_right(motorSpeed/2);
     delay(duration_90degree);
     stop();
-    delay(2000);
+    delay(1000);
     forwards(motorSpeed / 2);
     delay(duration_delivery);
     stop();
@@ -346,7 +422,7 @@ void blue_box()
     rotate_left(motorSpeed/2);
     delay(duration_90degree);
     stop();
-    delay(2000);
+    delay(1000);
     forwards(motorSpeed / 2);
     delay(duration_delivery);
     stop();
@@ -391,4 +467,9 @@ void close_servo() {
     myservo.write(pos);
     delay(15);
   }
+}
+
+/************************* SEARCH FUNCTION ***********************************/
+void search() {
+
 }

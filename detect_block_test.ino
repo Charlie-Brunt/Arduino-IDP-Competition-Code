@@ -88,6 +88,7 @@ void close_servo();
 void open_servo();
 void journeyLogic();
 void search();
+void blue_box();
 
 void setup()
 {
@@ -362,6 +363,8 @@ void journeyLogic()
         
     }
 
+  }
+  }
 }
 
 

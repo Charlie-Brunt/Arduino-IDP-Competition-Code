@@ -27,7 +27,7 @@ Adafruit_DCMotor *motor2 = AFMS.getMotor(2);
 Servo myservo;
 int pos = 0; // variable to store the servo position
 const int servo_startangle = 0;
-const int servo_endangle = 90;
+const int servo_endangle = 70;
 
 // Push button setup
 #define LOOP_STATE_STOPPED 0
@@ -384,13 +384,11 @@ void open_servo(){
     myservo.write(pos);
     delay(15);
   }
-  delay(1000);
 }
-void close_servo(){
-  for (pos = servo_endangle; pos <= servo_startangle; pos -= 1)
+void close_servo() {
+  for (pos = servo_endangle; pos >= servo_startangle; pos -= 1)
   { 
     myservo.write(pos);
     delay(15);
   }
-  delay(1000);
 }

@@ -121,6 +121,7 @@ void loop()
         // Turn on IR sensor if certain conditions are met
         if (carryingBlock == false)
         {
+            unsigned long currentMillis = millis();
             if (journeyCounter == journey1)
             {
                 if (currentMillis - previousMillis > duration_1)

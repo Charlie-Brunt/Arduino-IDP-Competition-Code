@@ -22,9 +22,9 @@ Arduino Uno Wifi Rev 2 code for "The Thing" including test programs for testing 
 ## Files:
 
 - **deliver_block_test** - test program to test line following, rotate180 and deliver for three journeys
-- **deliver_test** - calibration for delivering blocks
-- **check_distance** - logic for checking distance for each journey (redundant)
-- **first_pass_test** - initial first pass code (redundant)
+- **deliver_test** - calibration for delivering blocks (COMPLETE)
+- **check_distance** - logic for checking distance for each journey
+- **first_pass_test** - first pass line follow, rotate, deliver test protocol (COMPLETE)
 - **IR_sensor_test** - serial write distance readings from IR sensor#
 - **line_follower_test** - test for basic line following
 - **main** - first main program including all features

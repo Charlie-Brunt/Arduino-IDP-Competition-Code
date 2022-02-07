@@ -1,8 +1,11 @@
 # Group 105 IDP Software
 
+
+By Amanda Ge and Charlie Brunt
+
 Arduino Uno Wifi Rev 2 code for "The Thing" including test programs for testing motors, servos, movement commands, line following and block detection.
 
-## To do:
+## To do
 
 - [x] Test motors, servos, line sensors
 - [x] Motion commands with serial control
@@ -19,21 +22,24 @@ Arduino Uno Wifi Rev 2 code for "The Thing" including test programs for testing 
 - [ ] Write third pass search, store, fetch algorithm
 - [ ] Call functions from .cpp and .h files
 - [ ] Backup standard credit program
-## Files:
+## Files
 
-- **deliver_block_test** - test program to test line following, rotate180 and deliver for three journeys (broken, deprecated)
-- **deliver_test** - calibration for delivering blocks (COMPLETE)
-**detect_block_test** - program to test millis() timing over ramp and servo actuation
+### Component Tests
+
 - **check_distance** - logic for checking distance for each journey
-- **first_pass_test** - first pass line follow, rotate, deliver test protocol (COMPLETE)
+- **deliver_test** - calibration for delivering blocks (COMPLETE)
 - **IR_sensor_test** - serial write distance readings from IR sensor#
 - **line_follower_test** - test for basic line following
-- **main** - first main program including all features
 - **motion_serial_test** - send serial commands to control motion
 - **motion_test** - all motion functions
+- **motor_test** - basic motor testing
 - **servo_test** - test servo actuation
+
+### Integration Tests
+- **deliver_block_test** - test program to test line following, rotate180 and deliver for three journeys (broken, deprecated)
+- **detect_block_test** - program to test millis() timing over ramp, servo actuation, return and delivery
+- **first_pass_test** - first pass line follow, rotate, deliver test protocol (COMPLETE)
+- **main** - first main program including all features
 - **rotate_180_test** - test line follow and 180 deg rotations at junctions 
 
 
-
-By Amanda Ge and Charlie Brunt

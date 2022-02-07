@@ -1,28 +1,74 @@
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
-#define leftIn A0
-#define rightIn A1
+#include <ezButton.h>
+#include <SharpIR.h>
+#include <Servo.h>
 
+// Pin assignments
+#define leftIn A0  // left IR sensor
+#define rightIn A1 // right IR sensor
+#define echoPin 2    // ultrasonic sensor I
+#define triggerPin 3 // ultrasonic sensor II
+#define coarseLEDpin 1
+#define fineLEDpin 0
+#define pushButtonPin 7
+#define motionLEDpin 13
+#define IRPin A2
+#define model 1080
+
+// Motor setup
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *motor1 = AFMS.getMotor(1);
 Adafruit_DCMotor *motor2 = AFMS.getMotor(2);
 
-const int motionLEDpin = 13;
-int junctionCounter = 0;
+// Servo setup
+Servo myservo;
+int pos = 0; // variable to store the servo position
+const int servo_startangle = 0;
+const int servo_endangle = 90;
 
-const float motorSpeed = 255; // Adjust motor speed here
-const int turningRate = 0;    // Potential for turning rate adjustment?
-const int duration = 1000;
-bool lfReverse = false; 
-bool IsOffLine = false;
-bool IfRotate = false;
+// Push button setup
+#define LOOP_STATE_STOPPED 0
+#define LOOP_STATE_STARTED 1
+ezButton button(pushButtonPin);  // create ezButton object that attach to pin 7
+int loopState = LOOP_STATE_STOPPED;
 
+// IR sensor setup
+SharpIR mySensor = SharpIR(IRPin, model);
+int distance_cm;
+
+// Line sensor setup
 int LineSensor1;
 int LineSensor2;
 
+// Flags, state variables
+int junctionCounter = 0;
+#define startJunction 0   // for passing out of start box
+#define junction1 1       // for when passing deliver junction on outwards journey
+#define junction2 2       // for second junction
+#define junction3 3       // for when reaching end search zone
+#define deliverJunction 4 // for when delivering at deliver junction
+#define endJunction 5     // for passing into start box
+
+int journeyCounter = 1;
+#define journey1 1
+#define journey2 2
+#define journey3 3
+
+bool IfCoarse = false;
+bool IfRotate = false;
+bool IsOffLine = false;
+bool Ifdeliver = false;
+bool carryingBlock = false;
+bool Ifdetected = false;
+
+//Parameters
+const float motorSpeed = 255; // Adjust motor speed here
 const int duration_90degree = 3500;
 const int duration_delivery = 2000;
+const int bridgeDuration1 = 10000;
+long previousMillis;
 
 // function definitions
 void forwards();

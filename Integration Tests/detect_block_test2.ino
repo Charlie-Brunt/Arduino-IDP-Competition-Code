@@ -69,11 +69,8 @@ bool Return = false;
 
 // Parameters
 const float motorSpeed = 255; // Adjust motor speed here
-const int duration_90degree = 4000;
-const int duration_delivery = 2000;
-const int duration_1 = 10750;
-const int duration_2 = 5000;
-unsigned long previousMillis;
+const int duration_90degree = 2300;
+const int duration_delivery = 1600;
 const int IRthreshold = 950;
 
 // function definitions
@@ -131,8 +128,7 @@ void loop()
         /************************ MAIN PROGRAM STARTS HERE ************************/
         updateLineSensors(IRthreshold);
         distance_cm = mySensor.distance();
-        unsigned long currentMillis = millis();
-
+        
         if (IfRotate == true)
         {
             rotate180();

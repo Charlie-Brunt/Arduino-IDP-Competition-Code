@@ -53,7 +53,7 @@ int junctionCounter = 0;
 #define endJunction 5     // for passing into start box
 #define junction2return 6
 
-int journeyCounter = 2;
+int journeyCounter = 1;
 #define journey1 1
 #define journey2 2
 #define journey3 3
@@ -69,9 +69,8 @@ bool Return = false;
 
 // Parameters
 const float motorSpeed = 255; // Adjust motor speed here
-const int duration_90degree = 2300;
+const int duration_90degree = 2500;
 const int duration_delivery = 1600;
-unsigned long previousMillis;
 const int IRthreshold = 950;
 
 // function definitions
@@ -131,7 +130,7 @@ void loop()
         /************************ MAIN PROGRAM STARTS HERE ************************/
         updateLineSensors(IRthreshold);
         distance_cm = mySensor.distance();
-
+        
         if (IfRotate == true)
         {
             rotate180();
@@ -157,7 +156,6 @@ void loop()
                 collectIfInRange_2();
             }
         }
-
 
     }
 }
@@ -296,33 +294,31 @@ void journeyLogic()
         switch (junctionCounter)
         {
         case startJunction:
-            Serial.println(journeyCounter);
-            Serial.println("collect1");
+            Serial.println("startjunction");
             forwards(motorSpeed);
-            junctionCounter = junction1;
-            Serial.println("startJunction");
-            delay(1000);
+            junctionCounter++;
+            delay(1200);
             break;
         case junction1:
+            Serial.println("junction1");
             forwards(motorSpeed);
             junctionCounter = junction2;
-            Serial.println("junction1");
-            delay(1000);
+            delay(1200);
             break;
         case junction2:
+          Serial.println("junction2");
             stop();
             DistanceSensor = true;
             junctionCounter = deliverJunction;
-            Serial.println("junction2");
             break;
         case deliverJunction:
             stop();
             Ifdeliver = true;
             junctionCounter = junction2;
             journeyCounter = journey2;
-            Serial.println(journeyCounter);
             break;
         }
+        break;
 
     case journey2:
         switch (junctionCounter)
@@ -330,12 +326,21 @@ void journeyLogic()
         case junction2:
             Serial.println("junction2");
             forwards(motorSpeed);
-            delay(1000);
+            delay(500);
             DistanceSensor = true;
+            junctionCounter = junction3;
+            break;
+        case junction3:
+            Serial.println("junction2");
+            stop();
+            backwards(motorSpeed);
+            delay(1000);
+            stop();
+            IfRotate = true;
             junctionCounter = junction2return;
             break;
         case junction2return:
-          Serial.println("junction2return");
+            Serial.println("junction2return");
             forwards(motorSpeed);
             delay(1000);
             junctionCounter = deliverJunction;
@@ -353,7 +358,8 @@ void journeyLogic()
             stop();
             delay(1000000000);
         }
-    
+        break;
+
     case journey3:
         switch (junctionCounter)
         {
@@ -385,6 +391,7 @@ void journeyLogic()
             stop();
             delay(1000000000);
         }
+        break;
     }
 }
 
@@ -425,6 +432,7 @@ void red_box()
     stop();
     delay(1000);
     open_servo();
+    Ifdeliver = false;
     backwards(motorSpeed/2);
     delay(duration_delivery);
     if (Return == true) {
@@ -446,6 +454,9 @@ void red_box()
         }    
     }
     stop();
+    backwards(motorSpeed);
+    delay(700);
+    stop();
 }
 
 void blue_box()
@@ -460,7 +471,8 @@ void blue_box()
     stop();
     delay(1000);
     open_servo();
-    backwards(motorSpeed/2);
+    Ifdeliver = false;
+    backwards(motorSpeed/1.8);
     delay(duration_delivery);
     if (Return == true) {
         rotate_right(motorSpeed/1.5);
@@ -480,6 +492,9 @@ void blue_box()
             rotate_left(motorSpeed/2);
         }
     }
+    stop();
+    backwards(motorSpeed);
+    delay(700);
     stop();
 }
 /************************ DETECTION ***************************/
@@ -507,16 +522,13 @@ void collectIfInRange_1()
 
 void collectIfInRange_2()
 {
-    if (distance_cm <= 8)
+    if (distance_cm <= 7)
     {
         stop();
         delay(500);
         Serial.println("collect2");
         close_servo();
         DistanceSensor = false;
-        forwards(motorSpeed);
-        delay(500);
-        IfRotate = true;
     }
 }
 

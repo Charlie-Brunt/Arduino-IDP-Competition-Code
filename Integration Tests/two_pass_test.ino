@@ -53,7 +53,7 @@ int junctionCounter = 0;
 #define endJunction 5     // for passing into start box
 #define junction2return 6
 
-int journeyCounter = 1;
+int journeyCounter = 2;
 #define journey1 1
 #define journey2 2
 #define journey3 3
@@ -94,6 +94,8 @@ void toggleFineLED();
 void motionLED();
 void blue_box();
 void red_box();
+void collectIfInRange_1();
+void collectIfInRange_2();
 
 void setup()
 {
@@ -129,7 +131,6 @@ void loop()
         /************************ MAIN PROGRAM STARTS HERE ************************/
         updateLineSensors(IRthreshold);
         distance_cm = mySensor.distance();
-        unsigned long currentMillis = millis();
 
         if (IfRotate == true)
         {
@@ -295,25 +296,31 @@ void journeyLogic()
         switch (junctionCounter)
         {
         case startJunction:
+            Serial.println(journeyCounter);
+            Serial.println("collect1");
             forwards(motorSpeed);
-            junctionCounter++;
-            delay(1200);
+            junctionCounter = junction1;
+            Serial.println("startJunction");
+            delay(1000);
             break;
         case junction1:
             forwards(motorSpeed);
             junctionCounter = junction2;
-            delay(1200);
+            Serial.println("junction1");
+            delay(1000);
             break;
         case junction2:
             stop();
             DistanceSensor = true;
             junctionCounter = deliverJunction;
+            Serial.println("junction2");
             break;
         case deliverJunction:
             stop();
             Ifdeliver = true;
             junctionCounter = junction2;
             journeyCounter = journey2;
+            Serial.println(journeyCounter);
             break;
         }
 
@@ -321,23 +328,32 @@ void journeyLogic()
         switch (junctionCounter)
         {
         case junction2:
+            Serial.println("junction2");
             forwards(motorSpeed);
-            delay(700);
+            delay(1000);
             DistanceSensor = true;
             junctionCounter = junction2return;
             break;
         case junction2return:
+          Serial.println("junction2return");
             forwards(motorSpeed);
-            delay(700);
+            delay(1000);
             junctionCounter = deliverJunction;
             break;
         case deliverJunction:
             stop();
+            Return = true;
             Ifdeliver = true;
-            junctionCounter = junction2;
-            journeyCounter = journey3;
+            junctionCounter = startJunction;
             break;
+        case startJunction:
+            Serial.println("STOP");
+            forwards(motorSpeed);
+            delay(1000);
+            stop();
+            delay(1000000000);
         }
+    
     case journey3:
         switch (junctionCounter)
         {
@@ -418,6 +434,7 @@ void red_box()
         while (LineSensor1 == LOW){
             updateLineSensors(IRthreshold);
             rotate_right(motorSpeed/2);
+        }
     }
     else {
         rotate_right(motorSpeed/1.3);
@@ -452,6 +469,7 @@ void blue_box()
         while (LineSensor2 == LOW){
             updateLineSensors(IRthreshold);
             rotate_right(motorSpeed/2);
+        }
     }
     else {
         rotate_left(motorSpeed/1.5);
@@ -481,6 +499,7 @@ void collectIfInRange_1()
 {
     stop();
     delay(500);
+    Serial.println("collect1");
     close_servo();
     DistanceSensor = false;
     IfRotate = true;
@@ -492,6 +511,7 @@ void collectIfInRange_2()
     {
         stop();
         delay(500);
+        Serial.println("collect2");
         close_servo();
         DistanceSensor = false;
         forwards(motorSpeed);

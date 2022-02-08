@@ -65,8 +65,8 @@ bool Ifdetected = false;
 
 //Parameters
 const float motorSpeed = 255; // Adjust motor speed here
-const int duration_90degree = 3500;
-const int duration_delivery = 2000;
+const int duration_90degree = 2300;
+const int duration_delivery = 1600;
 const int bridgeDuration1 = 10000;
 long previousMillis;
 
@@ -95,15 +95,28 @@ void setup()
 
 void loop()
 {    
-    updateLineSensors(850);
+    button.loop();
 
-    if (IfRotate == true) {
-        rotate180();
+    if (button.isPressed())
+    {
+        if (loopState == LOOP_STATE_STOPPED)
+            loopState = LOOP_STATE_STARTED;
+        else // if(loopState == LOOP_STATE_STARTED)
+            loopState = LOOP_STATE_STOPPED;
     }
-    else{
-        Serial.println("line follow");
-        line_follow();
+
+    if (loopState == LOOP_STATE_STARTED)
+    {   updateLineSensors(850);
+
+        if (IfRotate == true) {
+            rotate180();
+        }
+        else{
+            line_follow();
+        }
+
     }
+    
 }
 
 void forwards(int speed)
@@ -238,7 +251,7 @@ void line_follow()
             break;
         case 3:
             stop();
-            blue_box();
+            red_box();
             junctionCounter = 2;
             break;
         }
@@ -268,9 +281,9 @@ void updateLineSensors(int threshold = 850) {
 
 void red_box()
 {
-    forwards(motorSpeed / 2);
+    forwards(motorSpeed / 1.5);
     delay(duration_delivery);
-    rotate_right(motorSpeed/2);
+    rotate_right(motorSpeed/1.3);
     delay(duration_90degree);
     stop();
     delay(2000);
@@ -278,8 +291,8 @@ void red_box()
     delay(duration_delivery);
     backwards(motorSpeed/2);
     delay(duration_delivery);
-    rotate_right(motorSpeed/2);
-    delay(duration_90degree*0.8);
+    rotate_right(motorSpeed/1.3);
+    delay(duration_90degree);
     updateLineSensors(850);
     while (LineSensor2 == LOW){
       updateLineSensors(850);
@@ -290,9 +303,9 @@ void red_box()
 
 void blue_box()
 {
-    forwards(motorSpeed / 2);
+    forwards(motorSpeed /1.5);
     delay(duration_delivery);
-    rotate_left(motorSpeed/2);
+    rotate_left(motorSpeed/1.5);
     delay(duration_90degree);
     stop();
     delay(2000);
@@ -302,8 +315,8 @@ void blue_box()
     delay(1000);
     backwards(motorSpeed/2);
     delay(duration_delivery);
-    rotate_left(motorSpeed/2);
-    delay(duration_90degree*0.8);
+    rotate_left(motorSpeed/1.5);
+    delay(duration_90degree*0.9);
     updateLineSensors(850);
     while (LineSensor1 == LOW){
       updateLineSensors(850);

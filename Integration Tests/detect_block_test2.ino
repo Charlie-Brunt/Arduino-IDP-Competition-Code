@@ -68,7 +68,7 @@ bool DistanceSensor = false;
 
 // Parameters
 const float motorSpeed = 255; // Adjust motor speed here
-const int duration_90degree = 3500;
+const int duration_90degree = 4000;
 const int duration_delivery = 2000;
 const int duration_1 = 10750;
 const int duration_2 = 5000;
@@ -108,7 +108,7 @@ void setup()
     myservo.attach(10);
     Serial.begin(9600);
     Serial.println("Ready!");
-    close_servo();
+    open_servo();
     delay(3000);
 }
 
@@ -180,7 +180,7 @@ void loop()
         // }
 
         if (DistanceSensor == true) {
-            collectIfInRange();
+            collectIfInRange_1();
         }
 
 
@@ -320,17 +320,9 @@ void line_follow()
             delay(1200);
             break;
         case junction2:
-            forwards(motorSpeed);
-            delay(700);  // Get over junction first
             stop();
-            open_servo();
             DistanceSensor = true;
-            junctionCounter = junction2return;
-            break;
-        case junction2return:
-            forwards(motorSpeed);
             junctionCounter = deliverJunction;
-            delay(1200);
             break;
         case deliverJunction:
             stop();
@@ -498,6 +490,15 @@ void collectIfInRange()
         DistanceSensor = false;
         IfRotate = true;
     }
+}
+
+void collectIfInRange_1() 
+{
+    stop();
+    delay(500);
+    close_servo();
+    DistanceSensor = false;
+    IfRotate = true;
 }
 
 /********************** SERVO ********************************/

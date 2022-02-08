@@ -65,6 +65,7 @@ bool Ifdeliver = false;
 bool carryingBlock = false;
 bool Ifdetected = false;
 bool DistanceSensor = false;
+bool Return = false;
 
 // Parameters
 const float motorSpeed = 255; // Adjust motor speed here
@@ -149,38 +150,13 @@ void loop()
             line_follow();
         }
 
-        // // Turn on IR sensor if certain conditions are met
-        // if (carryingBlock == false)
-        // {
-        //     if (journeyCounter == journey1)
-        //     {
-        //         if (currentMillis - previousMillis > duration_1)
-        //         {
-        //             collectIfInRange();
-        //         }
-        //     }
-        //     else if (journeyCounter == journey2)
-        //     {
-        //         if (currentMillis - previousMillis > duration_2)
-        //         {
-        //             collectIfInRange();
-        //         }
-        //     }
-        //     else if (journeyCounter == journey3)
-        //     {
-        //         if (junctionCounter == junction3)
-        //         {
-        //             collectIfInRange();
-        //         }
-        //     }
-        // }
-        // else
-        // {
-        //     digitalWrite(IRindicator, LOW);
-        // }
-
         if (DistanceSensor == true) {
-            collectIfInRange_1();
+            if (journeyCounter == journey1) {
+                collectIfInRange_1();
+            }
+            else if (journeyCounter = journey2) {
+                collectIfInRange_2();
+            }
         }
 
 
@@ -345,19 +321,23 @@ void journeyLogic()
         case startJunction:
             forwards(motorSpeed);
             junctionCounter++;
-            delay(1500);
+            delay(1200);
             break;
         case junction1:
             forwards(motorSpeed);
-            junctionCounter = deliverJunction;
-            long previousMillis = millis();
-            delay(1500);
+            junctionCounter = junction2;
+            delay(1200);
             break;
-
+        case junction2:
+            stop();
+            DistanceSensor = true;
+            junctionCounter = deliverJunction;
+            break;
         case deliverJunction:
             stop();
-            blue_box();
+            Ifdeliver = true;
             junctionCounter = junction2;
+            journeyCounter = journey2;
             break;
         }
 
@@ -366,18 +346,20 @@ void journeyLogic()
         {
         case junction2:
             forwards(motorSpeed);
-            delay(1000);
+            delay(700);
+            DistanceSensor = true;
             junctionCounter = junction2return;
             break;
         case junction2return:
             forwards(motorSpeed);
-            delay(1000);
+            delay(700);
             junctionCounter = deliverJunction;
             break;
         case deliverJunction:
             stop();
-            blue_box();
+            Ifdeliver = true;
             junctionCounter = junction2;
+            journeyCounter = journey3;
             break;
         }
     case journey3:
@@ -385,19 +367,31 @@ void journeyLogic()
         {
         case junction2:
             forwards(motorSpeed);
-            delay(1000);
+            delay(700);
             junctionCounter = junction3;
             break;
         case junction3:
             stop();
             search();
+            junctionCounter = junction2return;
+            IfRotate = true;  // temporary
+            break;
+        case junction2return:
+            forwards(motorSpeed);
+            delay(700);
             junctionCounter = deliverJunction;
             break;
         case deliverJunction:
             stop();
-            blue_box();
-            delay(1000000);
+            Return = true;
+            Ifdeliver = true;
+            junctionCounter = startJunction;
             break;
+        case startJunction:
+            forwards(motorSpeed);
+            delay(1000);
+            stop();
+            delay(1000000000);
         }
     }
 }
@@ -483,7 +477,6 @@ void collectIfInRange()
 {
     if (distance_cm <= 10)
     {
-        digitalWrite(IRindicator, HIGH);
         stop();
         delay(500);
         close_servo();
@@ -499,6 +492,20 @@ void collectIfInRange_1()
     close_servo();
     DistanceSensor = false;
     IfRotate = true;
+}
+
+void collectIfInRange_2()
+{
+    if (distance_cm <= 7)
+    {
+        stop();
+        delay(500);
+        close_servo();
+        DistanceSensor = false;
+        forwards(motorSpeed);
+        delay(500);
+        IfRotate = true;
+    }
 }
 
 /********************** SERVO ********************************/

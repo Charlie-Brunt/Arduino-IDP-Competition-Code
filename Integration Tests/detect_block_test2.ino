@@ -64,6 +64,7 @@ bool IsOffLine = false;
 bool Ifdeliver = false;
 bool carryingBlock = false;
 bool Ifdetected = false;
+bool DistanceSensor = false;
 
 // Parameters
 const float motorSpeed = 255; // Adjust motor speed here
@@ -107,7 +108,7 @@ void setup()
     myservo.attach(10);
     Serial.begin(9600);
     Serial.println("Ready!");
-    open_servo();
+    close_servo();
     delay(3000);
 }
 
@@ -135,39 +136,51 @@ void loop()
         {
             rotate180();
         }
+        else if (Ifdeliver == true) {
+            if (IfCoarse == true) {
+                red_box();
+            }
+            else {
+                blue_box();
+            }
+        }
         else
         {
             line_follow();
         }
 
-        // Turn on IR sensor if certain conditions are met
-        if (carryingBlock == false)
-        {
-            if (journeyCounter == journey1)
-            {
-                if (currentMillis - previousMillis > duration_1)
-                {
-                    collectIfInRange();
-                }
-            }
-            else if (journeyCounter == journey2)
-            {
-                if (currentMillis - previousMillis > duration_2)
-                {
-                    collectIfInRange();
-                }
-            }
-            else if (journeyCounter == journey3)
-            {
-                if (junctionCounter == junction3)
-                {
-                    collectIfInRange();
-                }
-            }
-        }
-        else
-        {
-            digitalWrite(IRindicator, LOW);
+        // // Turn on IR sensor if certain conditions are met
+        // if (carryingBlock == false)
+        // {
+        //     if (journeyCounter == journey1)
+        //     {
+        //         if (currentMillis - previousMillis > duration_1)
+        //         {
+        //             collectIfInRange();
+        //         }
+        //     }
+        //     else if (journeyCounter == journey2)
+        //     {
+        //         if (currentMillis - previousMillis > duration_2)
+        //         {
+        //             collectIfInRange();
+        //         }
+        //     }
+        //     else if (journeyCounter == journey3)
+        //     {
+        //         if (junctionCounter == junction3)
+        //         {
+        //             collectIfInRange();
+        //         }
+        //     }
+        // }
+        // else
+        // {
+        //     digitalWrite(IRindicator, LOW);
+        // }
+
+        if (DistanceSensor == true) {
+            collectIfInRange();
         }
 
 
@@ -296,23 +309,33 @@ void line_follow()
     {
         switch (junctionCounter)
         {
-        case 0:
-            
+        case startJunction:
             forwards(motorSpeed);
             junctionCounter++;
             delay(1200);
             break;
-        case 1:
+        case junction1:
             forwards(motorSpeed);
-            junctionCounter = deliverJunction;
-            previousMillis = millis();
+            junctionCounter = junction2;
             delay(1200);
             break;
-
+        case junction2:
+            forwards(motorSpeed);
+            delay(700);  // Get over junction first
+            stop();
+            open_servo();
+            DistanceSensor = true;
+            junctionCounter = junction2return;
+            break;
+        case junction2return:
+            forwards(motorSpeed);
+            junctionCounter = deliverJunction;
+            delay(1200);
+            break;
         case deliverJunction:
             stop();
-            blue_box();
-            junctionCounter = 2;
+            Ifdeliver = true;
+            junctionCounter = junction2;
             break;
         }
     }
@@ -423,6 +446,7 @@ void red_box()
     stop();
     delay(1000);
     open_servo();
+    digitalWrite(IRindicator, LOW);
     backwards(motorSpeed / 2);
     delay(duration_delivery);
     rotate_right(motorSpeed / 2);
@@ -434,8 +458,6 @@ void red_box()
         rotate_right(motorSpeed / 2);
     }
     stop();
-    carryingBlock = false;
-    previousMillis = millis();
 }
 
 void blue_box()
@@ -451,6 +473,7 @@ void blue_box()
     stop();
     delay(1000);
     open_servo();
+    digitalWrite(IRindicator, LOW);
     backwards(motorSpeed / 2);
     delay(duration_delivery);
     rotate_left(motorSpeed / 2);
@@ -462,21 +485,17 @@ void blue_box()
         rotate_left(motorSpeed / 2);
     }
     stop();
-    carryingBlock = false;
-    previousMillis = millis();
 }
 /************************ DETECTION ***************************/
 void collectIfInRange()
 {
-    digitalWrite(IRindicator, HIGH);
     if (distance_cm <= 10)
     {
+        digitalWrite(IRindicator, HIGH);
         stop();
-        delay(1000);
-        close_servo();
-        carryingBlock = true;
-        forwards(motorSpeed);
         delay(500);
+        close_servo();
+        DistanceSensor = false;
         IfRotate = true;
     }
 }

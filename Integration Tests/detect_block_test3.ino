@@ -68,7 +68,7 @@ bool DistanceSensor = false;
 
 // Parameters
 const float motorSpeed = 255; // Adjust motor speed here
-const int duration_90degree = 3500;
+const int duration_90degree = 4000;
 const int duration_delivery = 2000;
 const int duration_1 = 10750;
 const int duration_2 = 5000;
@@ -95,7 +95,6 @@ void toggleFineLED();
 void motionLED();
 void blue_box();
 void red_box();
-void collectIfInRange_1();
 
 void setup()
 {
@@ -131,33 +130,57 @@ void loop()
         /************************ MAIN PROGRAM STARTS HERE ************************/
         updateLineSensors(IRthreshold);
         distance_cm = mySensor.distance();
+        unsigned long currentMillis = millis();
 
         if (IfRotate == true)
         {
             rotate180();
+        }
+        else if (Ifdeliver == true) {
+            if (IfCoarse == true) {
+                red_box();
+            }
+            else {
+                blue_box();
+            }
         }
         else
         {
             line_follow();
         }
 
-        // Turn on IR sensor if certain conditions are met
-        if (DistanceSensor==true){
-                if (journeyCounter==journey1){
-                    collectIfInRange_1();
-                }
-                if (journeyCounter==journey2){
-                    continue
-                }
-                if (journeyCounter==journey3){
-                    continue
-                }
-                
-            }
-            
-        else
-        {
-            digitalWrite(IRindicator, LOW);
+        // // Turn on IR sensor if certain conditions are met
+        // if (carryingBlock == false)
+        // {
+        //     if (journeyCounter == journey1)
+        //     {
+        //         if (currentMillis - previousMillis > duration_1)
+        //         {
+        //             collectIfInRange();
+        //         }
+        //     }
+        //     else if (journeyCounter == journey2)
+        //     {
+        //         if (currentMillis - previousMillis > duration_2)
+        //         {
+        //             collectIfInRange();
+        //         }
+        //     }
+        //     else if (journeyCounter == journey3)
+        //     {
+        //         if (junctionCounter == junction3)
+        //         {
+        //             collectIfInRange();
+        //         }
+        //     }
+        // }
+        // else
+        // {
+        //     digitalWrite(IRindicator, LOW);
+        // }
+
+        if (DistanceSensor == true) {
+            collectIfInRange_1();
         }
 
 
@@ -286,28 +309,27 @@ void line_follow()
     {
         switch (junctionCounter)
         {
-        case 0:
-            
+        case startJunction:
             forwards(motorSpeed);
             junctionCounter++;
             delay(1200);
             break;
-        case 1:
+        case junction1:
             forwards(motorSpeed);
             junctionCounter = junction2;
             delay(1200);
             break;
-        
-        case 2:
+        case junction2:
+            forwards(motorSpeed/2);
+            delay(1000);  // Get over junction first
             stop();
-            delay(1000);
             DistanceSensor = true;
-            journeyCounter = deliverJunction;
-
+            junctionCounter = deliverJunction;
+            break;
         case deliverJunction:
             stop();
-            blue_box();
-            junctionCounter = 2;
+            Ifdeliver = true;
+            junctionCounter = junction2;
             break;
         }
     }
@@ -418,6 +440,7 @@ void red_box()
     stop();
     delay(1000);
     open_servo();
+    digitalWrite(IRindicator, LOW);
     backwards(motorSpeed / 2);
     delay(duration_delivery);
     rotate_right(motorSpeed / 2);
@@ -444,6 +467,7 @@ void blue_box()
     stop();
     delay(1000);
     open_servo();
+    digitalWrite(IRindicator, LOW);
     backwards(motorSpeed / 2);
     delay(duration_delivery);
     rotate_left(motorSpeed / 2);
@@ -459,37 +483,27 @@ void blue_box()
 /************************ DETECTION ***************************/
 void collectIfInRange()
 {
-    digitalWrite(IRindicator, HIGH);
     if (distance_cm <= 10)
     {
+        digitalWrite(IRindicator, HIGH);
         stop();
-        delay(1000);
+        delay(500);
         close_servo();
         DistanceSensor = false;
-        forwards(motorSpeed);
-        delay(500);
         IfRotate = true;
     }
 }
-void collectIfInRange_1()
-{   
-    digitalWrite(IRindicator, HIGH);
-    while (distance_cm < 10)
-    {   
-        backwards(motorSpeed/3);
-        distance_cm = mySensor.distance();
-        
-    }
+
+void collectIfInRange_1() 
+{
+    backwards(motorSpeed/2);
+    delay(3000);
     stop();
-    delay(1000);
+    delay(500);
     close_servo();
     DistanceSensor = false;
-    forwards(motorSpeed);
-    delay(500);
     IfRotate = true;
-
 }
-
 
 /********************** SERVO ********************************/
 void open_servo()

@@ -105,7 +105,7 @@ void setup()
     pinMode(IRindicator, OUTPUT);
     pinMode(coarseLEDpin, OUTPUT);
     pinMode(fineLEDpin, OUTPUT);
-    myservo.attach(10);
+    myservo.attach(9);
     Serial.begin(9600);
     Serial.println("Ready!");
     open_servo();
@@ -354,8 +354,9 @@ void journeyLogic()
         case startJunction:
             Serial.println("STOP");
             forwards(motorSpeed);
-            delay(1000);
+            delay(1650);
             stop();
+            close_servo();
             delay(1000000000);
         }
         break;

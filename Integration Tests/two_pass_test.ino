@@ -69,9 +69,9 @@ bool Return = false;
 
 // Parameters
 const float motorSpeed = 255; // Adjust motor speed here
-const int duration_90degree = 2500;
+const int duration_90degree = 2300;
 const int duration_delivery = 1600;
-const int IRthreshold = 850;
+const int IRthreshold = 900;
 
 // function definitions
 void forwards();

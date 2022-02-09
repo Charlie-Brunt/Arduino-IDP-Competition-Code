@@ -71,7 +71,7 @@ bool Return = false;
 const float motorSpeed = 255; // Adjust motor speed here
 const int duration_90degree = 2500;
 const int duration_delivery = 1600;
-const int IRthreshold = 950;
+const int IRthreshold = 850;
 
 // function definitions
 void forwards();
@@ -334,7 +334,7 @@ void journeyLogic()
             Serial.println("junction2");
             stop();
             backwards(motorSpeed);
-            delay(1000);
+            delay(600);
             stop();
             IfRotate = true;
             junctionCounter = junction2return;
@@ -439,7 +439,7 @@ void red_box()
     delay(duration_delivery);
     if (Return == true) {
         rotate_left(motorSpeed/1.3);
-        delay(duration_90degree);
+        delay(duration_90degree*0.8);
         updateLineSensors(IRthreshold);
         while (LineSensor1 == LOW){
             updateLineSensors(IRthreshold);
@@ -448,7 +448,7 @@ void red_box()
     }
     else {
         rotate_right(motorSpeed/1.3);
-        delay(duration_90degree);
+        delay(duration_90degree*0.8);
         updateLineSensors(IRthreshold);
         while (LineSensor2 == LOW){
             updateLineSensors(IRthreshold);
@@ -481,7 +481,7 @@ void blue_box()
     delay(duration_delivery);
     if (Return == true) {
         rotate_right(motorSpeed/1.5);
-        delay(duration_90degree*0.9);
+        delay(duration_90degree*0.8);
         updateLineSensors(IRthreshold);
         while (LineSensor2 == LOW){
             updateLineSensors(IRthreshold);
@@ -490,7 +490,7 @@ void blue_box()
     }
     else {
         rotate_left(motorSpeed/1.5);
-        delay(duration_90degree*0.9);
+        delay(duration_90degree*0.8);
         updateLineSensors(IRthreshold);
         while (LineSensor1 == LOW){
             updateLineSensors(IRthreshold);
@@ -529,6 +529,8 @@ void collectIfInRange_1()
     }
     close_servo();
     DistanceSensor = false;
+    forwards(motorSpeed);
+    delay(500);
     IfRotate = true;
 }
 

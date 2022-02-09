@@ -69,9 +69,8 @@ bool Return = false;
 
 // Parameters
 const float motorSpeed = 255; // Adjust motor speed here
-const int duration_90degree = 2300;
+const int duration_90degree = 2500;
 const int duration_delivery = 1600;
-unsigned long previousMillis;
 const int IRthreshold = 950;
 
 // function definitions
@@ -94,6 +93,8 @@ void toggleFineLED();
 void motionLED();
 void blue_box();
 void red_box();
+void collectIfInRange_1();
+void collectIfInRange_2();
 
 void setup()
 {
@@ -104,7 +105,7 @@ void setup()
     pinMode(IRindicator, OUTPUT);
     pinMode(coarseLEDpin, OUTPUT);
     pinMode(fineLEDpin, OUTPUT);
-    myservo.attach(10);
+    myservo.attach(9);
     Serial.begin(9600);
     Serial.println("Ready!");
     open_servo();
@@ -129,8 +130,7 @@ void loop()
         /************************ MAIN PROGRAM STARTS HERE ************************/
         updateLineSensors(IRthreshold);
         distance_cm = mySensor.distance();
-        unsigned long currentMillis = millis();
-
+        
         if (IfRotate == true)
         {
             rotate180();
@@ -156,7 +156,6 @@ void loop()
                 collectIfInRange_2();
             }
         }
-
 
     }
 }
@@ -295,16 +294,19 @@ void journeyLogic()
         switch (junctionCounter)
         {
         case startJunction:
+            Serial.println("startjunction");
             forwards(motorSpeed);
             junctionCounter++;
             delay(1200);
             break;
         case junction1:
+            Serial.println("junction1");
             forwards(motorSpeed);
             junctionCounter = junction2;
             delay(1200);
             break;
         case junction2:
+          Serial.println("junction2");
             stop();
             DistanceSensor = true;
             junctionCounter = deliverJunction;
@@ -316,28 +318,49 @@ void journeyLogic()
             journeyCounter = journey2;
             break;
         }
+        break;
 
     case journey2:
         switch (junctionCounter)
         {
         case junction2:
+            Serial.println("junction2");
             forwards(motorSpeed);
-            delay(700);
+            delay(500);
             DistanceSensor = true;
+            junctionCounter = junction3;
+            break;
+        case junction3:
+            Serial.println("junction2");
+            stop();
+            backwards(motorSpeed);
+            delay(1000);
+            stop();
+            IfRotate = true;
             junctionCounter = junction2return;
             break;
         case junction2return:
+            Serial.println("junction2return");
             forwards(motorSpeed);
-            delay(700);
+            delay(1000);
             junctionCounter = deliverJunction;
             break;
         case deliverJunction:
             stop();
+            Return = true;
             Ifdeliver = true;
-            junctionCounter = junction2;
-            journeyCounter = journey3;
+            junctionCounter = startJunction;
             break;
+        case startJunction:
+            Serial.println("STOP");
+            forwards(motorSpeed);
+            delay(1650);
+            stop();
+            close_servo();
+            delay(1000000000);
         }
+        break;
+
     case journey3:
         switch (junctionCounter)
         {
@@ -369,6 +392,7 @@ void journeyLogic()
             stop();
             delay(1000000000);
         }
+        break;
     }
 }
 
@@ -398,7 +422,8 @@ void updateLineSensors(int threshold = 950)
 /************************** DELIVERY ***************************/
 
 void red_box()
-{
+{   
+    toggleCoarseLED();
     forwards(motorSpeed / 1.5);
     delay(duration_delivery);
     rotate_right(motorSpeed/1.3);
@@ -409,6 +434,7 @@ void red_box()
     stop();
     delay(1000);
     open_servo();
+    Ifdeliver = false;
     backwards(motorSpeed/2);
     delay(duration_delivery);
     if (Return == true) {
@@ -418,6 +444,7 @@ void red_box()
         while (LineSensor1 == LOW){
             updateLineSensors(IRthreshold);
             rotate_right(motorSpeed/2);
+        }
     }
     else {
         rotate_right(motorSpeed/1.3);
@@ -426,13 +453,19 @@ void red_box()
         while (LineSensor2 == LOW){
             updateLineSensors(IRthreshold);
             rotate_right(motorSpeed/2);
-        }    
+        }
+        stop();
+        backwards(motorSpeed);
+        delay(700);
+        
     }
+    
     stop();
 }
 
 void blue_box()
 {
+    toggleFineLED();
     forwards(motorSpeed /1.5);
     delay(duration_delivery);
     rotate_left(motorSpeed/1.5);
@@ -443,7 +476,8 @@ void blue_box()
     stop();
     delay(1000);
     open_servo();
-    backwards(motorSpeed/2);
+    Ifdeliver = false;
+    backwards(motorSpeed/1.8);
     delay(duration_delivery);
     if (Return == true) {
         rotate_right(motorSpeed/1.5);
@@ -452,6 +486,7 @@ void blue_box()
         while (LineSensor2 == LOW){
             updateLineSensors(IRthreshold);
             rotate_right(motorSpeed/2);
+        }
     }
     else {
         rotate_left(motorSpeed/1.5);
@@ -461,7 +496,11 @@ void blue_box()
             updateLineSensors(IRthreshold);
             rotate_left(motorSpeed/2);
         }
+        stop();
+        backwards(motorSpeed);
+        delay(700);
     }
+    
     stop();
 }
 /************************ DETECTION ***************************/
@@ -481,6 +520,13 @@ void collectIfInRange_1()
 {
     stop();
     delay(500);
+    Serial.println("collect1");
+    if (IfCoarse == true) {
+        toggleCoarseLED();
+    } 
+    else {
+        toggleFineLED();
+    }
     close_servo();
     DistanceSensor = false;
     IfRotate = true;
@@ -488,19 +534,23 @@ void collectIfInRange_1()
 
 void collectIfInRange_2()
 {
-    if (distance_cm <= 8)
+    if (distance_cm <= 7)
     {
         stop();
         delay(500);
+        Serial.println("collect2");
+        if (IfCoarse == true) {
+        toggleCoarseLED();
+    } 
+    else {
+        toggleFineLED();
+    }
         close_servo();
         DistanceSensor = false;
-        forwards(motorSpeed);
-        delay(500);
-        IfRotate = true;
     }
 }
 
-/********************** SERVO ********************************/
+/*************************** SERVO ********************************/
 void open_servo()
 {
     for (pos = servo_startangle; pos <= servo_endangle; pos += 1)

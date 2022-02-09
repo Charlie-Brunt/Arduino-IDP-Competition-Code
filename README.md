@@ -43,6 +43,8 @@ Arduino Uno Wifi Rev 2 code for "The Thing" including test programs for testing 
 ### Integration Tests
 - **deliver_block_test** - test program to test line following, rotate180 and deliver for three journeys (broken & obsolete)
 - **detect_block_test** - program to test millis() timing over ramp, servo actuation, return and delivery
+- **detect_block_test2** - program to test robot pushing the block before grabbing it
+- **detect_block_test3** - program to test grabbers pushing the block before grabbing it
 - **first_pass_test** - first pass line follow, rotate, deliver test protocol (complete)
 - **rotate_180_test** - test line follow and 180 degree rotations at junctions 
 

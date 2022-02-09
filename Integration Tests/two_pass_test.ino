@@ -421,7 +421,8 @@ void updateLineSensors(int threshold = 950)
 /************************** DELIVERY ***************************/
 
 void red_box()
-{
+{   
+    toggleCoarseLED();
     forwards(motorSpeed / 1.5);
     delay(duration_delivery);
     rotate_right(motorSpeed/1.3);
@@ -463,6 +464,7 @@ void red_box()
 
 void blue_box()
 {
+    toggleFineLED();
     forwards(motorSpeed /1.5);
     delay(duration_delivery);
     rotate_left(motorSpeed/1.5);
@@ -518,6 +520,12 @@ void collectIfInRange_1()
     stop();
     delay(500);
     Serial.println("collect1");
+    if (IfCoarse == true) {
+        toggleCoarseLED();
+    } 
+    else {
+        toggleFineLED();
+    }
     close_servo();
     DistanceSensor = false;
     IfRotate = true;
@@ -530,12 +538,18 @@ void collectIfInRange_2()
         stop();
         delay(500);
         Serial.println("collect2");
+        if (IfCoarse == true) {
+        toggleCoarseLED();
+    } 
+    else {
+        toggleFineLED();
+    }
         close_servo();
         DistanceSensor = false;
     }
 }
 
-/********************** SERVO ********************************/
+/*************************** SERVO ********************************/
 void open_servo()
 {
     for (pos = servo_startangle; pos <= servo_endangle; pos += 1)

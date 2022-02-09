@@ -4,12 +4,14 @@
 #include <ezButton.h>
 #include <SharpIR.h>
 #include <Servo.h>
+#include <NewPing.h>
 
 // Pin assignments
 #define leftIn A0    // left IR sensor
 #define rightIn A1   // right IR sensor
 #define echoPin 2    // ultrasonic sensor I
 #define triggerPin 3 // ultrasonic sensor II
+#define MAX_DISTANCE 200
 #define coarseLEDpin 1
 #define fineLEDpin 0
 #define pushButtonPin 7
@@ -40,9 +42,11 @@ SharpIR mySensor = SharpIR(IRPin, model);
 int distance_cm;
 
 // Ultrasonic setup
-long duration; // variable for the duration of sound wave travel
+NewPing sonar(triggerPin, echoPin, MAX_DISTANCE);
 int dist; // variable for the distance measurement
-int prevDist = 990;
+unsigned int pingSpeed = 50; // How frequently are we going to send out a ping (in milliseconds). 50ms would be 20 times a second.
+unsigned long pingTimer;     // Holds the next ping time.
+
 
 // Line sensor setup
 int LineSensor1;
@@ -113,6 +117,7 @@ void setup()
     pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
     pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
     myservo.attach(10);
+    pingTimer = millis();
     Serial.begin(9600);
     Serial.println("Ready!");
     open_servo();
@@ -136,6 +141,12 @@ void loop()
     {
         /************************ MAIN PROGRAM STARTS HERE ************************/
         updateLineSensors(IRthreshold);
+
+        if (millis() >= pingTimer) {   // pingSpeed milliseconds since last ping, do another ping.
+            pingTimer += pingSpeed;      // Set the next ping time.
+            sonar.ping_timer(echoCheck); // Send out the ping, calls "echoCheck" function every 24uS where you can check the ping status.
+        }
+
         distance_cm = mySensor.distance();
 
         ultrasonic_measurement();
@@ -147,9 +158,11 @@ void loop()
         else if (Ifdeliver == true) {
             if (IfCoarse == true) {
                 red_box();
+                IfCoarse = false;
             }
             else {
                 blue_box();
+                IfCoarse = false;
             }
         }
         else
@@ -599,31 +612,14 @@ void motionLED()
 
 
 
-void ultrasonic_measurement() {
-  // Clears the trigPin condition
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-  // Sets the trigPin HIGH (ACTIVE) for 10 microseconds
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-  // Reads the echoPin, returns the sound wave travel time in microseconds
-  duration = pulseIn(echoPin, HIGH);
-  // record the previous distance and calculate the new distance
-  prevDist = dist;
-  dist = duration * 0.034 / 2; // Speed of sound wave divided by 2 (go and back)
-  // Displays the distance on the Serial Monitor
-  Serial.print("Distance: ");
-  Serial.print(dist);
-  Serial.println(" cm");
-  // check if there is an item less than x cm away
-  if(dist < 20 and prevDist < 20) {
-      ifCoarse = true;
+void echoCheck() { // Timer2 interrupt calls this function every 24uS where you can check the ping status.
+  if (sonar.check_timer()) { // This is how you check to see if the ping was received.
+    dist = sonar.ping_result / US_ROUNDTRIP_CM;
+    Serial.println(dist)); // Ping returned, uS result in ping_result, convert to cm with US_ROUNDTRIP_CM.
+    if (dist<20) {
+        IfCoarse = true;
+    }
+
   }
-  else { 
-      ifCoarse = false;
-  }
-  // display whether it is coarse or not.
-  Serial.print("Coarse?: ");
-  Serial.print(ifCoarse); 
+
 }

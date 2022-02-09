@@ -451,11 +451,13 @@ void red_box()
         while (LineSensor2 == LOW){
             updateLineSensors(IRthreshold);
             rotate_right(motorSpeed/2);
-        }    
+        }
+        stop();
+        backwards(motorSpeed);
+        delay(700);
+        
     }
-    stop();
-    backwards(motorSpeed);
-    delay(700);
+    
     stop();
 }
 
@@ -491,10 +493,11 @@ void blue_box()
             updateLineSensors(IRthreshold);
             rotate_left(motorSpeed/2);
         }
+        stop();
+        backwards(motorSpeed);
+        delay(700);
     }
-    stop();
-    backwards(motorSpeed);
-    delay(700);
+    
     stop();
 }
 /************************ DETECTION ***************************/

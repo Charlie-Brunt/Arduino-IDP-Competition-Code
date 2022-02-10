@@ -483,6 +483,7 @@ void search()
     IfFinding = true;
     angle_found = false;
     int stepdelay = 300;
+    int previous_distance = 10; //or whatever the distance between the start pos and wall is 
 
     //moves it to start pos
     rotate_left(motorSpeed / 1.3);
@@ -495,11 +496,17 @@ void search()
         delay(duration_90degree/10);
         distance_cm = mySensor.distance();
         //detected something
+        //2 methods of detecting a block below, comment one out 
+
+        //simple check distance 
         if (distance_cm <= 20) { //change the 20
             angle_found = true;
-            //either change collectIfInRange to bool return or redo if loop
-            
-            //How to go ahead by only a bit???
+
+        //look for step change 
+        if ((distance_cm - previous_distance)>8){ //change 8 to tested value 
+            angle_found = true;
+            previous_distance = distance_cm;
+
             while found == false{
                 if (distance_cm <= 10) {
                     collectIfInRange();

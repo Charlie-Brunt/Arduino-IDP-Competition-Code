@@ -446,8 +446,6 @@ void collectIfInRange()
         toggleFineLED();
     }
     close_servo();
-    forwards(motorSpeed/2);
-    delay(500);
 }
 
 void collectIfInRange_1() 

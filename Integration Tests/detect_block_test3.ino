@@ -65,6 +65,7 @@ bool Ifdeliver = false;
 bool carryingBlock = false;
 bool Ifdetected = false;
 bool DistanceSensor = false;
+bool IfSearching = true;
 
 // Parameters
 const float motorSpeed = 255; // Adjust motor speed here
@@ -143,6 +144,9 @@ void loop()
             else {
                 blue_box();
             }
+        }
+        else if (IfSearching == true){
+            search();
         }
         else
         {
@@ -526,6 +530,44 @@ void close_servo()
 /************************* SEARCH FUNCTION ***********************************/
 void search()
 {
+    IfFinding = true;
+    angle_found = false;
+
+    //moves it to start pos
+    rotate_left(motorSpeed / 3);
+    delay(duration_90degree);
+
+    while (angle_found  == false){
+        found = false
+        n = 0;
+        rotate_right(motorSpeed / 3);
+        delay(duration_90degree/10);
+        //detected something
+        if (distance_cm <= 20) { //change the 20
+            angle_found = true;
+            //either change collectIfInRange to bool return or redo if loop
+            
+            //How to go ahead by only a bit???
+            while found == false{
+                if (distance_cm <= 10) {
+                    collectIfInRange();
+                    found = true;
+
+                }
+                else {
+                    forwards(motorSpeed);
+                    n++;
+                    if (n>10){
+                        angle_found = false;
+                        found = true;
+                        rotate180();
+                        //go back 10 steps, not sure how to
+                        rotate180();   
+                    }
+                }
+            }
+        } 
+    }
 }
 
 /******************** INDICATOR LEDS *********************/

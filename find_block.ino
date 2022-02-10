@@ -58,6 +58,7 @@ int journeyCounter = 1;
 
 bool IfCoarse = false;
 bool IfRotate = false;
+bool IfFinding = false;
 bool IsOffLine = false;
 bool Ifdeliver = false;
 bool carryingBlock = false;
@@ -114,6 +115,7 @@ void loop()
         if (IfRotate == true) {
             rotate180();
         }
+        
         else {
             line_follow();
         }
@@ -429,14 +431,42 @@ void updateLineSensors(int threshold = 850) {
 }
 /****************************** SWEEP FIELD **********************************/
 void find_block(){
-    found = false;
+    IfFinding = true;
+    angle_found = false;
+
+    //moves it to start pos
     rotate_left(motorSpeed / 3);
     delay(duration_90degree);
-    while found  == false{
+
+    while (angle_found  == false){
+        found = false
+        n = 0;
         rotate_right(motorSpeed / 3);
         delay(duration_90degree/10);
-        if (distance_cm <= 20) {
-            //go forwards
-            //and do the collectIfInRange();
+        //detected something
+        if (distance_cm <= 20) { //change the 20
+            angle_found = true;
+            //either change collectIfInRange to bool return or redo if loop
+            
+            //How to go ahead by only a bit???
+            while found == false{
+                if (distance_cm <= 10) {
+                    collectIfInRange();
+                    found = true;
+
+                }
+                else {
+                    forwards(motorSpeed);
+                    n++;
+                    if (n>10){
+                        angle_found = false;
+                        found = true;
+                        rotate180();
+                        //go back 10 steps, not sure how to
+                        rotate180();   
+                    }
+                }
+            }
+        } 
     }
 }

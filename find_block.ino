@@ -71,6 +71,10 @@ const int duration_delivery = 3000;
 const int bridgeDuration1 = 10000;
 long previousMillis;
 
+void search();
+void open_servo();
+void close_servo();
+
 void setup()
 {
     AFMS.begin();
@@ -79,7 +83,7 @@ void setup()
     pinMode(rightIn, INPUT);
     pinMode(coarseLEDpin, OUTPUT);
     pinMode(fineLEDpin, OUTPUT);
-    pinMode(distanceSensorPin, INPUT);
+    pinMode(IRPin, INPUT);
 
     button.setDebounceTime(20); // set debounce time to 50 milliseconds
 
@@ -107,8 +111,6 @@ void loop()
     {
         /************************ MAIN PROGRAM STARTS HERE ************************/
         
-
-        updateLineSensors(850);  // reads line sensor analog data and assigns HIGH / LOW
         search();
         delay(10000000);
     }
@@ -130,7 +132,7 @@ void backwards(int speed)
     motor2->setSpeed(speed);
     motor1->run(BACKWARD);
     motor2->run(BACKWARD);
-    motionLED():
+    motionLED();
 }
 
 void turn_right_forwards(int speed_high, int speed_low)
@@ -232,6 +234,9 @@ void toggleFineLED() {
 void motionLED() {
     digitalWrite(motionLEDpin, HIGH);
 }
+void journeyLogic(){
+
+}
 /************************ DETECTION ***************************/
 void collectIfInRange() {
     if (distance_cm <= 10) {
@@ -247,19 +252,19 @@ void open_servo(){
   for (pos = servo_startangle; pos <= servo_endangle; pos += 1)
   { 
     myservo.write(pos);
-    delay(500);
+    delay(15);
+  }
 }
 void close_servo(){
-  for (pos = servo_endangle; pos <= servo_startangle; pos -= 1)
+  for (pos = servo_endangle; pos >= servo_startangle; pos -= 1)
   { 
     myservo.write(pos);
-    delay(500);
+    delay(15);
+  }
 }
 
 /************************* SEARCH FUNCTION ***********************************/
-void search() {
 
-}
 
 /********************** LINE SENSOR UPDATE STATE ***************************/
 void updateLineSensors(int threshold = 850) {
@@ -288,29 +293,42 @@ void search(){
     int search_duration = 1000;
     //moves it to start pos
     rotate_left(motorSpeed / 1.3);
-    delay(duration_90degree/4);
-    forwards(motorSpeed/3);
+    delay(duration_90degree/5);
+    forwards(motorSpeed);
     delay(search_duration);
+    stop();
+    delay(500);
     close_servo();
-    backwards(motorSpeed/3);
+    backwards(motorSpeed);
     delay(search_duration);
-    open_servo()
+    stop();
+    delay(500);
+    open_servo();
 
     rotate_right(motorSpeed / 1.3);
-    delay(duration_90degree/4);
-    forwards(motorSpeed/3);
+    delay(duration_90degree/5);
+    forwards(motorSpeed);
     delay(search_duration);
+    stop();
+    delay(500);
     close_servo();
-    backwards(motorSpeed/3);
+    backwards(motorSpeed);
     delay(search_duration);
-    open_servo()
+    stop();
+    delay(500);
+    open_servo();
 
     rotate_right(motorSpeed / 1.3);
-    delay(duration_90degree/4);
-    forwards(motorSpeed/3);
+    delay(duration_90degree/5);
+    forwards(motorSpeed);
     delay(search_duration);
+    stop();
+    delay(500);
     close_servo();
-    backwards(motorSpeed/3);
+    backwards(motorSpeed);
     delay(search_duration);
+    stop();
+    delay(500);
+    open_servo();
 
 }

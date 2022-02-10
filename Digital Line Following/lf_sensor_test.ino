@@ -21,20 +21,20 @@ void loop(){
   //printing values of the sensors to the serial monitor
 
   Serial.print("Left:  ");
-  Serial.println(analogRead(leftIn));
+  Serial.println(digitalRead(leftIn));
   Serial.print("Right: ");
-  Serial.println(analogRead(rightIn));                              
+  Serial.println(digitalRead(rightIn));                              
   delay(1000);
 
 //sets left LineSensor1 to high if on tape, else Low
-  if(analogRead(leftIn) >= 850){
+  if(digitalRead(leftIn) == 1){
       LineSensor1 = HIGH;
   }
   else {
       LineSensor1 = LOW;
   }
   //sets right LineSensor2 to high if on tape, else Low
-  if(analogRead(rightIn) >= 850){
+  if(digitalRead(rightIn) == 1){
       LineSensor2 = HIGH;
   }
   else {

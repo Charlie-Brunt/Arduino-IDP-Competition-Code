@@ -514,7 +514,7 @@ void search()
 
                 }
                 else {
-                    forwards(motorSpeed);
+                    forwards(motorSpeed/3);
                     delay(stepdelay);
                     distance_cm = mySensor.distance();
                     n++;

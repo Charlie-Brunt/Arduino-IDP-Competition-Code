@@ -425,6 +425,8 @@ void red_box()
     Ifdeliver = false;
     backwards(motorSpeed/2);
     delay(duration_delivery);
+    stop();
+    close_servo();
     if (Return == true) {
         rotate_left(motorSpeed/1.3);
         delay(duration_90degree*0.8);
@@ -447,7 +449,7 @@ void red_box()
         delay(700);
         
     }
-    
+    open_servo();
     stop();
 }
 
@@ -467,6 +469,8 @@ void blue_box()
     Ifdeliver = false;
     backwards(motorSpeed/1.8);
     delay(duration_delivery);
+    stop();
+    close_servo();
     if (Return == true) {
         rotate_right(motorSpeed/1.5);
         delay(duration_90degree*0.8);
@@ -488,7 +492,7 @@ void blue_box()
         backwards(motorSpeed);
         delay(700);
     }
-    
+    open_servo();
     stop();
 }
 /************************ DETECTION ***************************/

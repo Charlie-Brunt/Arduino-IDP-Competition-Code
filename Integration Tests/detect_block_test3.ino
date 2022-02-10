@@ -437,15 +437,15 @@ void blue_box()
 /************************ DETECTION ***************************/
 void collectIfInRange()
 {
-    if (distance_cm <= 10)
-    {
-        digitalWrite(IRindicator, HIGH);
-        stop();
-        delay(500);
-        close_servo();
-        DistanceSensor = false;
-        IfRotate = true;
+    stop();
+    delay(500);
+    if (IfCoarse == true) {
+        toggleCoarseLED();
+    } 
+    else {
+        toggleFineLED();
     }
+    close_servo();
 }
 
 void collectIfInRange_1() 

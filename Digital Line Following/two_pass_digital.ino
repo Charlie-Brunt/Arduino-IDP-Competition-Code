@@ -6,8 +6,8 @@
 #include <Servo.h>
 
 // Pin assignments
-#define leftIn 5    // left IR sensor
-#define rightIn 6   // right IR sensor
+#define leftIn 6    // left IR sensor
+#define rightIn 5   // right IR sensor
 #define echoPin 2    // ultrasonic sensor I
 #define triggerPin 3 // ultrasonic sensor II
 #define coarseLEDpin 1
@@ -16,7 +16,6 @@
 #define motionLEDpin 13
 #define IRPin A0
 #define model 1080
-#define IRindicator 5
 
 // Motor setup
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
@@ -27,7 +26,7 @@ Adafruit_DCMotor *motor2 = AFMS.getMotor(2);
 Servo myservo;
 int pos = 0; // variable to store the servo position
 const int servo_startangle = 0;
-const int servo_endangle = 70;
+const int servo_endangle = 90;
 
 // Push button setup
 #define LOOP_STATE_STOPPED 0
@@ -100,7 +99,6 @@ void setup()
     pinMode(motionLEDpin, OUTPUT);
     pinMode(leftIn, INPUT);
     pinMode(rightIn, INPUT);
-    pinMode(IRindicator, OUTPUT);
     pinMode(coarseLEDpin, OUTPUT);
     pinMode(fineLEDpin, OUTPUT);
     myservo.attach(9);
@@ -330,6 +328,7 @@ void journeyLogic()
             DistanceSensor = true;
             junctionCounter = junction2return;
             break;
+        case junction2return:
             forwards(motorSpeed);
             delay(1000);
             junctionCounter = deliverJunction;
@@ -445,11 +444,11 @@ void red_box()
             rotate_right(motorSpeed/2);
         }
         stop();
+        open_servo();
         backwards(motorSpeed);
         delay(700);
         
     }
-    open_servo();
     stop();
 }
 
@@ -489,10 +488,10 @@ void blue_box()
             rotate_left(motorSpeed/2);
         }
         stop();
+        open_servo();
         backwards(motorSpeed);
         delay(700);
     }
-    open_servo();
     stop();
 }
 /************************ DETECTION ***************************/

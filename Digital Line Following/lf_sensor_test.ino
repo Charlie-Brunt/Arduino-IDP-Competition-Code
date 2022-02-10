@@ -1,7 +1,7 @@
 
 //defining pins and variables
-#define leftIn A0
-#define rightIn A1
+#define leftIn 6
+#define rightIn 5
 
 void setup() {
   //declaring pin types
@@ -20,11 +20,11 @@ void loop(){
   
   //printing values of the sensors to the serial monitor
 
-  Serial.print("Left:  ");
-  Serial.println(digitalRead(leftIn));
-  Serial.print("Right: ");
+  Serial.print("Left: ");
+  Serial.print(digitalRead(leftIn));
+  Serial.print("    Right: ");
   Serial.println(digitalRead(rightIn));                              
-  delay(1000);
+  delay(100);
 
 //sets left LineSensor1 to high if on tape, else Low
   if(digitalRead(leftIn) == 1){

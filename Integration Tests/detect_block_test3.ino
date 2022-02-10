@@ -133,60 +133,10 @@ void loop()
         distance_cm = mySensor.distance();
         unsigned long currentMillis = millis();
 
-        if (IfRotate == true)
-        {
-            rotate180();
-        }
-        else if (Ifdeliver == true) {
-            if (IfCoarse == true) {
-                red_box();
-            }
-            else {
-                blue_box();
-            }
-        }
-        else if (IfSearching == true){
-            search();
-        }
-        else
-        {
-            line_follow();
-        }
+        search();
+        delay(10000000);
 
-        // // Turn on IR sensor if certain conditions are met
-        // if (carryingBlock == false)
-        // {
-        //     if (journeyCounter == journey1)
-        //     {
-        //         if (currentMillis - previousMillis > duration_1)
-        //         {
-        //             collectIfInRange();
-        //         }
-        //     }
-        //     else if (journeyCounter == journey2)
-        //     {
-        //         if (currentMillis - previousMillis > duration_2)
-        //         {
-        //             collectIfInRange();
-        //         }
-        //     }
-        //     else if (journeyCounter == journey3)
-        //     {
-        //         if (junctionCounter == junction3)
-        //         {
-        //             collectIfInRange();
-        //         }
-        //     }
-        // }
-        // else
-        // {
-        //     digitalWrite(IRindicator, LOW);
-        // }
-
-        if (DistanceSensor == true) {
-            collectIfInRange_1();
-        }
-
+        
 
     }
 }
@@ -532,6 +482,7 @@ void search()
 {
     IfFinding = true;
     angle_found = false;
+    int stepdelay = 300;
 
     //moves it to start pos
     rotate_left(motorSpeed / 3);
@@ -542,6 +493,7 @@ void search()
         n = 0;
         rotate_right(motorSpeed / 3);
         delay(duration_90degree/10);
+        distance_cm = mySensor.distance();
         //detected something
         if (distance_cm <= 20) { //change the 20
             angle_found = true;
@@ -556,13 +508,14 @@ void search()
                 }
                 else {
                     forwards(motorSpeed);
+                    delay(stepdelay);
+                    distance_cm = mySensor.distance();
                     n++;
                     if (n>10){
                         angle_found = false;
                         found = true;
-                        rotate180();
-                        //go back 10 steps, not sure how to
-                        rotate180();   
+                        backwards(motorSpeed);
+                        delay(10*stepdelay);                        //go back 10 steps, not sure how to  
                     }
                 }
             }

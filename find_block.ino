@@ -66,7 +66,7 @@ bool Ifdetected = false;
 
 //Parameters
 const float motorSpeed = 255; // Adjust motor speed here
-const int duration_90degree = 6000;
+const int duration_90degree = 2300;
 const int duration_delivery = 3000;
 const int bridgeDuration1 = 10000;
 long previousMillis;
@@ -109,34 +109,10 @@ void loop()
         
 
         updateLineSensors(850);  // reads line sensor analog data and assigns HIGH / LOW
-        distance_cm = mySensor.getDistance();  // update distance sensor
-
-        // prevents line_follow and rotate180 conflicting
-        if (IfRotate == true) {
-            rotate180();
-        }
-        
-        else {
-            line_follow();
-        }
-
-        /* Turn on IR if certain conditions are met e.g. clear of the ramp or 
-        junction 2 and if not carrying the block */
-        if (carryingBlock == false) {
-            if ((journeyCounter == journey1) {
-                unsigned long currentMillis = millis();
-                if (currentMillis - previousMillis > bridgeDuration1) {
-                    collectIfInRange();
-                }
-            }
-            else if ((journeyCounter == journey2) && (junctionCounter == junction3)) {
-                collectIfInRange();
-            }
-            else if ((journeyCounter == journey3) && (junctionCounter == junction3)) {
-                find_block();
-            }
-        }
+        search();
+        delay(10000000);
     }
+
 }
 /******************************** MOVEMENT FUNCTIONS ********************************/
 void forwards(int speed)
@@ -243,128 +219,6 @@ void line_follow()
         journeyLogic();
     }
 }
-/*********************** DELIVERY *******************/
-void red_box()
-{
-    forwards(motorSpeed / 3);
-    delay(duration_delivery);
-    turn_right_forwards(motorSpeed / 3);
-    delay(duration_90degree);
-    forwards(motorSpeed / 3);
-    delay(duration_delivery);
-    open_servo();
-    backwards(motorSpeed / 3);
-    delay(duration_delivery);
-    turn_right_forwards(motorSpeed / 3);
-    delay(duration_90degree);
-    stop();
-    carryingBlock = false;
-}
-
-void blue_box()
-{
-    forwards(motorSpeed / 3);
-    delay(duration_delivery);
-    turn_left_forwards(motorSpeed / 3);
-    delay(duration_90degree);
-    forwards(motorSpeed / 3);
-    delay(duration_delivery);
-    open_servo();
-    backwards(motorSpeed / 3);
-    delay(duration_delivery);
-    turn_left_forwards(motorSpeed / 3);
-    delay(duration_90degree);
-    stop();
-    carryingBlock = false;
-}
-
-void deliver() {
-    if (IfCoarse == true)
-    {
-        red_box();
-    }
-    else
-    {
-        blue_box();
-    }
-}
-/*********************** JOURNEY LOGIC ***********************/
-
-void journeyLogic()
-{
-    switch (journeyCounter)
-    {
-    case journey1:
-
-        switch (junctionCounter)
-        {
-        case startJunction:
-            forwards(motorSpeed);
-            junctionCounter++;
-            delay(1500);
-            break;
-        case junction1:
-            forwards(motorSpeed);
-            junctionCounter = deliverJunction;
-            long previousMillis = millis();  // bridge timer starts here
-            delay(1500);
-            break;
-        case deliverJunction:
-            stop();
-            delay(1500);
-            deliver();
-            junctionCounter = junction2;
-            journeyCounter++;
-            break;
-        }
-
-    case journey2:
-
-        switch (junctionCounter)
-        {
-        case junction2:
-            forwards(motorSpeed);
-            junctionCounter = junction3;  // Virtual junction 2 for return journey
-            delay(1000);
-            break;
-        case junction3:
-            forwards(motorSpeed);
-            junctionCounter = deliverJunction;
-            delay(1500);
-            break;
-        case deliverJunction:
-            stop();
-            delay(1500);
-            deliver();
-            junctionCounter = junction2;
-            journeyCounter++;
-            break;
-        }
-
-    case journey3:
-
-        switch (junctionCounter)
-        {
-        case junction2:
-            forwards(motorSpeed);
-            junctionCounter++;
-            delay(1500);
-            break;
-        case junction3:
-            stop();
-            delay(1500);
-            search();
-            junctionCounter = deliverJunction;
-            break;
-        case deliverJunction:
-            stop();
-            delay(1500);
-            deliver();
-            delay(1000000); // Placeholder to end program
-            break;
-        }
-    }
-}
 
 /******************** INDICATOR LEDS *********************/
 void toggleCoarseLED() {
@@ -430,43 +284,33 @@ void updateLineSensors(int threshold = 850) {
     }    
 }
 /****************************** SWEEP FIELD **********************************/
-void find_block(){
-    IfFinding = true;
-    angle_found = false;
-
+void search(){
+    int search_duration = 1000;
     //moves it to start pos
-    rotate_left(motorSpeed / 3);
-    delay(duration_90degree);
+    rotate_left(motorSpeed / 1.3);
+    delay(duration_90degree/4);
+    forwards(motorSpeed/3);
+    delay(search_duration);
+    close_servo();
+    backwards(motorSpeed/3);
+    delay(search_duration);
+    open_servo()
 
-    while (angle_found  == false){
-        found = false
-        n = 0;
-        rotate_right(motorSpeed / 3);
-        delay(duration_90degree/10);
-        //detected something
-        if (distance_cm <= 20) { //change the 20
-            angle_found = true;
-            //either change collectIfInRange to bool return or redo if loop
-            
-            //How to go ahead by only a bit???
-            while found == false{
-                if (distance_cm <= 10) {
-                    collectIfInRange();
-                    found = true;
+    rotate_right(motorSpeed / 1.3);
+    delay(duration_90degree/4);
+    forwards(motorSpeed/3);
+    delay(search_duration);
+    close_servo();
+    backwards(motorSpeed/3);
+    delay(search_duration);
+    open_servo()
 
-                }
-                else {
-                    forwards(motorSpeed);
-                    n++;
-                    if (n>10){
-                        angle_found = false;
-                        found = true;
-                        rotate180();
-                        //go back 10 steps, not sure how to
-                        rotate180();   
-                    }
-                }
-            }
-        } 
-    }
+    rotate_right(motorSpeed / 1.3);
+    delay(duration_90degree/4);
+    forwards(motorSpeed/3);
+    delay(search_duration);
+    close_servo();
+    backwards(motorSpeed/3);
+    delay(search_duration);
+
 }

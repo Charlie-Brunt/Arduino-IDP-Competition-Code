@@ -69,7 +69,7 @@ bool IfSearching = true;
 
 // Parameters
 const float motorSpeed = 255; // Adjust motor speed here
-const int duration_90degree = 4000;
+const int duration_90degree = 2300;
 const int duration_delivery = 2000;
 const int duration_1 = 10750;
 const int duration_2 = 5000;
@@ -485,7 +485,7 @@ void search()
     int stepdelay = 300;
 
     //moves it to start pos
-    rotate_left(motorSpeed / 3);
+    rotate_left(motorSpeed / 1.3);
     delay(duration_90degree);
 
     while (angle_found  == false){

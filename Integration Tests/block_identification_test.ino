@@ -4,12 +4,14 @@
 #include <ezButton.h>
 #include <SharpIR.h>
 #include <Servo.h>
+#include <NewPing.h>
 
 // Pin assignments
 #define leftIn A0    // left IR sensor
 #define rightIn A1   // right IR sensor
 #define echoPin 2    // ultrasonic sensor I
 #define triggerPin 3 // ultrasonic sensor II
+#define MAX_DISTANCE 200
 #define coarseLEDpin 1
 #define fineLEDpin 0
 #define pushButtonPin 7
@@ -38,6 +40,13 @@ int loopState = LOOP_STATE_STOPPED;
 // IR sensor setup
 SharpIR mySensor = SharpIR(IRPin, model);
 int distance_cm;
+
+// Ultrasonic setup
+NewPing sonar(triggerPin, echoPin, MAX_DISTANCE);
+int dist; // variable for the distance measurement
+unsigned int pingSpeed = 50; // How frequently are we going to send out a ping (in milliseconds). 50ms would be 20 times a second.
+unsigned long pingTimer;     // Holds the next ping time.
+
 
 // Line sensor setup
 int LineSensor1;
@@ -69,9 +78,9 @@ bool Return = false;
 
 // Parameters
 const float motorSpeed = 255; // Adjust motor speed here
-const int duration_90degree = 2300;
+const int duration_90degree = 2500;
 const int duration_delivery = 1600;
-const int IRthreshold = 900;
+const int IRthreshold = 950;
 
 // function definitions
 void forwards();
@@ -105,7 +114,10 @@ void setup()
     pinMode(IRindicator, OUTPUT);
     pinMode(coarseLEDpin, OUTPUT);
     pinMode(fineLEDpin, OUTPUT);
-    myservo.attach(9);
+    pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
+    pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
+    myservo.attach(10);
+    pingTimer = millis();
     Serial.begin(9600);
     Serial.println("Ready!");
     open_servo();
@@ -129,7 +141,15 @@ void loop()
     {
         /************************ MAIN PROGRAM STARTS HERE ************************/
         updateLineSensors(IRthreshold);
+
+        if (millis() >= pingTimer) {   // pingSpeed milliseconds since last ping, do another ping.
+            pingTimer += pingSpeed;      // Set the next ping time.
+            sonar.ping_timer(echoCheck); // Send out the ping, calls "echoCheck" function every 24uS where you can check the ping status.
+        }
+
         distance_cm = mySensor.distance();
+
+        ultrasonic_measurement();
         
         if (IfRotate == true)
         {
@@ -138,9 +158,11 @@ void loop()
         else if (Ifdeliver == true) {
             if (IfCoarse == true) {
                 red_box();
+                IfCoarse = false;
             }
             else {
                 blue_box();
+                IfCoarse = false;
             }
         }
         else
@@ -334,7 +356,7 @@ void journeyLogic()
             Serial.println("junction2");
             stop();
             backwards(motorSpeed);
-            delay(600);
+            delay(1000);
             stop();
             IfRotate = true;
             junctionCounter = junction2return;
@@ -354,9 +376,8 @@ void journeyLogic()
         case startJunction:
             Serial.println("STOP");
             forwards(motorSpeed);
-            delay(1650);
+            delay(1000);
             stop();
-            close_servo();
             delay(1000000000);
         }
         break;
@@ -439,7 +460,7 @@ void red_box()
     delay(duration_delivery);
     if (Return == true) {
         rotate_left(motorSpeed/1.3);
-        delay(duration_90degree*0.8);
+        delay(duration_90degree);
         updateLineSensors(IRthreshold);
         while (LineSensor1 == LOW){
             updateLineSensors(IRthreshold);
@@ -448,7 +469,7 @@ void red_box()
     }
     else {
         rotate_right(motorSpeed/1.3);
-        delay(duration_90degree*0.8);
+        delay(duration_90degree);
         updateLineSensors(IRthreshold);
         while (LineSensor2 == LOW){
             updateLineSensors(IRthreshold);
@@ -481,7 +502,7 @@ void blue_box()
     delay(duration_delivery);
     if (Return == true) {
         rotate_right(motorSpeed/1.5);
-        delay(duration_90degree*0.8);
+        delay(duration_90degree*0.9);
         updateLineSensors(IRthreshold);
         while (LineSensor2 == LOW){
             updateLineSensors(IRthreshold);
@@ -490,7 +511,7 @@ void blue_box()
     }
     else {
         rotate_left(motorSpeed/1.5);
-        delay(duration_90degree*0.8);
+        delay(duration_90degree*0.9);
         updateLineSensors(IRthreshold);
         while (LineSensor1 == LOW){
             updateLineSensors(IRthreshold);
@@ -529,8 +550,6 @@ void collectIfInRange_1()
     }
     close_servo();
     DistanceSensor = false;
-    forwards(motorSpeed);
-    delay(500);
     IfRotate = true;
 }
 
@@ -589,4 +608,18 @@ void toggleFineLED()
 void motionLED()
 {
     digitalWrite(motionLEDpin, HIGH);
+}
+
+
+
+void echoCheck() { // Timer2 interrupt calls this function every 24uS where you can check the ping status.
+  if (sonar.check_timer()) { // This is how you check to see if the ping was received.
+    dist = sonar.ping_result / US_ROUNDTRIP_CM;
+    Serial.println(dist)); // Ping returned, uS result in ping_result, convert to cm with US_ROUNDTRIP_CM.
+    if (dist<20) {
+        IfCoarse = true;
+    }
+
+  }
+
 }

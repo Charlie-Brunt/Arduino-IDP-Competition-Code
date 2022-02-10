@@ -65,10 +65,11 @@ bool Ifdeliver = false;
 bool carryingBlock = false;
 bool Ifdetected = false;
 bool DistanceSensor = false;
+bool IfSearching = true;
 
 // Parameters
 const float motorSpeed = 255; // Adjust motor speed here
-const int duration_90degree = 4000;
+const int duration_90degree = 2300;
 const int duration_delivery = 2000;
 const int duration_1 = 10750;
 const int duration_2 = 5000;
@@ -132,57 +133,10 @@ void loop()
         distance_cm = mySensor.distance();
         unsigned long currentMillis = millis();
 
-        if (IfRotate == true)
-        {
-            rotate180();
-        }
-        else if (Ifdeliver == true) {
-            if (IfCoarse == true) {
-                red_box();
-            }
-            else {
-                blue_box();
-            }
-        }
-        else
-        {
-            line_follow();
-        }
+        search();
+        delay(10000000);
 
-        // // Turn on IR sensor if certain conditions are met
-        // if (carryingBlock == false)
-        // {
-        //     if (journeyCounter == journey1)
-        //     {
-        //         if (currentMillis - previousMillis > duration_1)
-        //         {
-        //             collectIfInRange();
-        //         }
-        //     }
-        //     else if (journeyCounter == journey2)
-        //     {
-        //         if (currentMillis - previousMillis > duration_2)
-        //         {
-        //             collectIfInRange();
-        //         }
-        //     }
-        //     else if (journeyCounter == journey3)
-        //     {
-        //         if (junctionCounter == junction3)
-        //         {
-        //             collectIfInRange();
-        //         }
-        //     }
-        // }
-        // else
-        // {
-        //     digitalWrite(IRindicator, LOW);
-        // }
-
-        if (DistanceSensor == true) {
-            collectIfInRange_1();
-        }
-
+        
 
     }
 }
@@ -483,15 +437,15 @@ void blue_box()
 /************************ DETECTION ***************************/
 void collectIfInRange()
 {
-    if (distance_cm <= 10)
-    {
-        digitalWrite(IRindicator, HIGH);
-        stop();
-        delay(500);
-        close_servo();
-        DistanceSensor = false;
-        IfRotate = true;
+    stop();
+    delay(500);
+    if (IfCoarse == true) {
+        toggleCoarseLED();
+    } 
+    else {
+        toggleFineLED();
     }
+    close_servo();
 }
 
 void collectIfInRange_1() 
@@ -526,6 +480,54 @@ void close_servo()
 /************************* SEARCH FUNCTION ***********************************/
 void search()
 {
+    IfFinding = true;
+    angle_found = false;
+    int stepdelay = 300;
+    int previous_distance = 10; //or whatever the distance between the start pos and wall is 
+
+    //moves it to start pos
+    rotate_left(motorSpeed / 1.3);
+    delay(duration_90degree);
+
+    while (angle_found  == false){
+        found = false
+        n = 0;
+        rotate_right(motorSpeed / 3);
+        delay(duration_90degree/10);
+        distance_cm = mySensor.distance();
+        //detected something
+        //2 methods of detecting a block below, comment one out 
+
+        //simple check distance 
+        if (distance_cm <= 20) { //change the 20
+            angle_found = true;
+
+        //look for step change 
+        if ((distance_cm - previous_distance)>8){ //change 8 to tested value 
+            angle_found = true;
+            previous_distance = distance_cm;
+
+            while found == false{
+                if (distance_cm <= 10) {
+                    collectIfInRange();
+                    found = true;
+
+                }
+                else {
+                    forwards(motorSpeed/3);
+                    delay(stepdelay);
+                    distance_cm = mySensor.distance();
+                    n++;
+                    if (n>10){
+                        angle_found = false;
+                        found = true;
+                        backwards(motorSpeed);
+                        delay(10*stepdelay);                        //go back 10 steps, not sure how to  
+                    }
+                }
+            }
+        } 
+    }
 }
 
 /******************** INDICATOR LEDS *********************/

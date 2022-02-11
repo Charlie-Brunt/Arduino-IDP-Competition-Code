@@ -60,6 +60,7 @@ Post-first-competition tests with improved line following through digital pins.
 - **three_pass_test** - three passes with search
 - **two_pass_digital** - first competition program with digital line following
 - **ultrasonic_two_pass** - testing block identification with ultrasonic sensor
-### System Tests
+### Main Programs
+Finalised code used for competitions.
 - **first competition** - first competition program scoring 80 pts
 - **main** - initial main program to test latest features (obsolete)

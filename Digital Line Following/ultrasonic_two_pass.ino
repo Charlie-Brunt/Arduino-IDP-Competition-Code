@@ -259,7 +259,7 @@ void rotate180()
         }
     }
 }
-/******************************** LINE FOLLOWING ALGORITHM ********************************/
+/******************************** LINE FOLLOWING ALGORITHMS ********************************/
 void line_follow()
 {
     if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
@@ -277,6 +277,27 @@ void line_follow()
     else if ((LineSensor1 == HIGH) && (LineSensor2 == HIGH))
     {
         journeyLogic();
+    }
+}
+
+void line_follow_until_junction()
+{
+    if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
+    {
+        forwards(motorSpeed);
+    }
+    else if ((LineSensor1 == LOW) && (LineSensor2 == HIGH))
+    {
+        turn_right_forwards(motorSpeed, motorSpeed / 4);
+    }
+    else if ((LineSensor1 == HIGH) && (LineSensor2 == LOW))
+    {
+        turn_left_forwards(motorSpeed, motorSpeed / 4);
+    }
+    else if ((LineSensor1 == HIGH) && (LineSensor2 == HIGH))
+    {
+        stop();
+        rotate180();
     }
 }
 
@@ -579,4 +600,11 @@ void toggleFineLED()
 void motionLED()
 {
     digitalWrite(motionLEDpin, HIGH);
+}
+
+/******************************** IDENTIFICATION ROUTINE ************************************/
+void identifyBLock() {
+    switch (journeyCounter) {
+        case journey1
+    }
 }

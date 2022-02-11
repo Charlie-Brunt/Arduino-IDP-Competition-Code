@@ -244,7 +244,6 @@ void collectIfInRange() {
        stop();
        close_servo();
        delay(1000);
-       carryingBlock = true;
    
 }
 
@@ -295,11 +294,11 @@ void search(){
     bool IfFinding = true;
     bool angle_found = false;
     int stepdelay = 300;
-    int previous_distance = 10; //or whatever the distance between the start pos and wall is 
+   
 
     //moves it to start pos
     rotate_left(motorSpeed / 1.3);
-    delay(duration_90degree/1.5);
+    delay(duration_90degree/4);
 
     while (angle_found  == false){
         bool found = false;
@@ -307,40 +306,24 @@ void search(){
         rotate_right(motorSpeed / 3);
         delay(duration_90degree/10);
         distance_cm = mySensor.distance();
-        Serial.println(distance_cm);
         //detected something
         //2 methods of detecting a block below, comment one out 
 
         //simple check distance 
         if (distance_cm <= 30) { //change the 20
             angle_found = true;
+            int steps_to_travel = distance_cm;
 
         //look for step change 
-        // if ((distance_cm - previous_distance)>8){ //change 8 to tested value 
-        //     angle_found = true;
-        //     previous_distance = distance_cm;
-
             while (found == false){
-                if (distance_cm <= 10) {
-                  Serial.println("find");
+                if (n>steps_to_travel){
                    collectIfInRange();
                    found = true;
-
                 }
                 else {
-                  Serial.println("forwards");
-  
-                
-                    forwards(motorSpeed/3);
-                    delay(stepdelay);
-                    distance_cm = mySensor.distance();
-                    Serial.println(distance_cm);
-                    n++;
-                    if (n>300){
-                        angle_found = false;
-                        found = true;
-                        backwards(motorSpeed/3);
-                        delay(n*stepdelay);   
+                         n++;
+                        forwards(motorSpeed/2);
+                        delay(stepdelay);
                     }
                 }
             }

@@ -26,7 +26,7 @@ Adafruit_DCMotor *motor2 = AFMS.getMotor(2);
 Servo myservo;
 int pos = 0; // variable to store the servo position
 const int servo_startangle = 0;
-const int servo_endangle = 90;
+const int servo_endangle = 70;
 
 // Push button setup
 #define LOOP_STATE_STOPPED 0
@@ -150,6 +150,9 @@ void loop()
             }
             else if (journeyCounter = journey2) {
                 collectIfInRange_2();
+            }
+            else if (journeyCounter = journey3){
+                search();
             }
         }
 
@@ -497,14 +500,15 @@ void blue_box()
 /************************ DETECTION ***************************/
 void collectIfInRange()
 {
-    if (distance_cm <= 10)
-    {
-        stop();
-        delay(500);
-        close_servo();
-        DistanceSensor = false;
-        IfRotate = true;
+    stop();
+    delay(500);
+    if (IfCoarse == true) {
+        toggleCoarseLED();
+    } 
+    else {
+        toggleFineLED();
     }
+    close_servo();
 }
 
 void collectIfInRange_1() 

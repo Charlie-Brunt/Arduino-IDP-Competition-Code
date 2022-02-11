@@ -503,9 +503,9 @@ void search()
             angle_found = true;
 
         //look for step change 
-        if ((distance_cm - previous_distance)>8){ //change 8 to tested value 
-            angle_found = true;
-            previous_distance = distance_cm;
+        // if ((distance_cm - previous_distance)>8){ //change 8 to tested value 
+        //     angle_found = true;
+        //     previous_distance = distance_cm;
 
             while found == false{
                 if (distance_cm <= 10) {
@@ -522,7 +522,7 @@ void search()
                         angle_found = false;
                         found = true;
                         backwards(motorSpeed);
-                        delay(10*stepdelay);                        //go back 10 steps, not sure how to  
+                        delay(10*stepdelay);   
                     }
                 }
             }

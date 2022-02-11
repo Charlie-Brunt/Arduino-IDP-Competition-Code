@@ -26,7 +26,7 @@ Adafruit_DCMotor *motor2 = AFMS.getMotor(2);
 Servo myservo;
 int pos = 0; // variable to store the servo position
 const int servo_startangle = 0;
-const int servo_endangle = 90;
+const int servo_endangle = 70;
 
 // Push button setup
 #define LOOP_STATE_STOPPED 0
@@ -150,6 +150,9 @@ void loop()
             }
             else if (journeyCounter = journey2) {
                 collectIfInRange_2();
+            }
+            else if (journeyCounter = journey3){
+                search();
             }
         }
 
@@ -335,17 +338,10 @@ void journeyLogic()
             break;
         case deliverJunction:
             stop();
-            Return = true;
             Ifdeliver = true;
-            junctionCounter = startJunction;
+            junctionCounter = junction2;
+            journeyCounter = journey3;
             break;
-        case startJunction:
-            forwards(motorSpeed);
-            delay(1650);
-            stop();
-            close_servo();
-            delay(1000000000);
-        }
         break;
 
     case journey3:
@@ -353,7 +349,7 @@ void journeyLogic()
         {
         case junction2:
             forwards(motorSpeed);
-            delay(700);
+            delay(500);
             junctionCounter = junction3;
             break;
         case junction3:
@@ -364,7 +360,7 @@ void journeyLogic()
             break;
         case junction2return:
             forwards(motorSpeed);
-            delay(700);
+            delay(1000);
             junctionCounter = deliverJunction;
             break;
         case deliverJunction:
@@ -375,7 +371,7 @@ void journeyLogic()
             break;
         case startJunction:
             forwards(motorSpeed);
-            delay(1000);
+            delay(1650);
             stop();
             delay(1000000000);
         }
@@ -497,14 +493,15 @@ void blue_box()
 /************************ DETECTION ***************************/
 void collectIfInRange()
 {
-    if (distance_cm <= 10)
-    {
-        stop();
-        delay(500);
-        close_servo();
-        DistanceSensor = false;
-        IfRotate = true;
+    stop();
+    delay(500);
+    if (IfCoarse == true) {
+        toggleCoarseLED();
+    } 
+    else {
+        toggleFineLED();
     }
+    close_servo();
 }
 
 void collectIfInRange_1() 
@@ -563,6 +560,54 @@ void close_servo()
 /************************* SEARCH FUNCTION ***********************************/
 void search()
 {
+    bool IfFinding = true;
+    bool angle_found = false;
+    int stepdelay = 300;
+    int previous_distance = 10; //or whatever the distance between the start pos and wall is 
+
+    //moves it to start pos
+    rotate_left(motorSpeed / 1.3);
+    delay(duration_90degree);
+
+    while (angle_found  == false){
+        found = false
+        n = 0;
+        rotate_right(motorSpeed / 3);
+        delay(duration_90degree/10);
+        distance_cm = mySensor.distance();
+        //detected something
+        //2 methods of detecting a block below, comment one out 
+
+        //simple check distance 
+        if (distance_cm <= 20) { //change the 20
+            angle_found = true;
+
+        //look for step change 
+        // if ((distance_cm - previous_distance)>8){ //change 8 to tested value 
+        //     angle_found = true;
+        //     previous_distance = distance_cm;
+
+            while found == false{
+                if (distance_cm <= 10) {
+                    collectIfInRange();
+                    found = true;
+
+                }
+                else {
+                    forwards(motorSpeed/3);
+                    delay(stepdelay);
+                    distance_cm = mySensor.distance();
+                    n++;
+                    if (n>10){
+                        angle_found = false;
+                        found = true;
+                        backwards(motorSpeed);
+                        delay(10*stepdelay);   
+                    }
+                }
+            }
+        } 
+    }
 }
 
 /******************** INDICATOR LEDS *********************/

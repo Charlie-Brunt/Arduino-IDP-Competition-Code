@@ -26,7 +26,7 @@ Adafruit_DCMotor *motor2 = AFMS.getMotor(2);
 Servo myservo;
 int pos = 0; // variable to store the servo position
 const int servo_startangle = 0;
-const int servo_endangle = 90;
+const int servo_endangle = 70;
 
 // Push button setup
 #define LOOP_STATE_STOPPED 0
@@ -84,8 +84,10 @@ void setup()
     pinMode(coarseLEDpin, OUTPUT);
     pinMode(fineLEDpin, OUTPUT);
     pinMode(IRPin, INPUT);
+    myservo.attach(9);
 
     button.setDebounceTime(20); // set debounce time to 50 milliseconds
+    open_servo();
 
     Serial.begin(9600);
     Serial.println("Ready!");
@@ -238,28 +240,31 @@ void journeyLogic(){
 }
 /************************ DETECTION ***************************/
 void collectIfInRange() {
-    if (distance_cm <= 10) {
-        stop();
-        close_servo();
-        carryingBlock = true;
-        rotate180();
-    }
+    
+       stop();
+       close_servo();
+       delay(1000);
+       carryingBlock = true;
+   
 }
 
 /********************** SERVO ********************************/
-void open_servo(){
-  for (pos = servo_startangle; pos <= servo_endangle; pos += 1)
-  { 
-    myservo.write(pos);
-    delay(15);
-  }
+/********************** SERVO ********************************/
+void open_servo()
+{
+    for (pos = servo_startangle; pos <= servo_endangle; pos += 1)
+    {
+        myservo.write(pos);
+        delay(15);
+    }
 }
-void close_servo(){
-  for (pos = servo_endangle; pos >= servo_startangle; pos -= 1)
-  { 
-    myservo.write(pos);
-    delay(15);
-  }
+void close_servo()
+{
+    for (pos = servo_endangle; pos >= servo_startangle; pos -= 1)
+    {
+        myservo.write(pos);
+        delay(15);
+    }
 }
 
 
@@ -294,19 +299,20 @@ void search(){
 
     //moves it to start pos
     rotate_left(motorSpeed / 1.3);
-    delay(duration_90degree);
+    delay(duration_90degree/1.5);
 
     while (angle_found  == false){
-        found = false
-        n = 0;
+        bool found = false;
+        int n = 0;
         rotate_right(motorSpeed / 3);
         delay(duration_90degree/10);
         distance_cm = mySensor.distance();
+        Serial.println(distance_cm);
         //detected something
         //2 methods of detecting a block below, comment one out 
 
         //simple check distance 
-        if (distance_cm <= 20) { //change the 20
+        if (distance_cm <= 30) { //change the 20
             angle_found = true;
 
         //look for step change 
@@ -314,22 +320,27 @@ void search(){
         //     angle_found = true;
         //     previous_distance = distance_cm;
 
-            while found == false{
+            while (found == false){
                 if (distance_cm <= 10) {
-                    collectIfInRange();
-                    found = true;
+                  Serial.println("find");
+                   collectIfInRange();
+                   found = true;
 
                 }
                 else {
+                  Serial.println("forwards");
+  
+                
                     forwards(motorSpeed/3);
                     delay(stepdelay);
                     distance_cm = mySensor.distance();
+                    Serial.println(distance_cm);
                     n++;
-                    if (n>10){
+                    if (n>300){
                         angle_found = false;
                         found = true;
-                        backwards(motorSpeed);
-                        delay(10*stepdelay);   
+                        backwards(motorSpeed/3);
+                        delay(n*stepdelay);   
                     }
                 }
             }

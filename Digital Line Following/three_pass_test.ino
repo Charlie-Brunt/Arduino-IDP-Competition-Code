@@ -354,9 +354,9 @@ void journeyLogic()
             break;
         case junction3:
             stop();
-            search();
+            DistanceSensor = true;
             junctionCounter = junction2return;
-            IfRotate = true;  // temporary
+            IfRotate = true; 
             break;
         case junction2return:
             forwards(motorSpeed);
@@ -558,57 +558,54 @@ void close_servo()
 }
 
 /************************* SEARCH FUNCTION ***********************************/
-void search()
-{
+void search(){
     bool IfFinding = true;
     bool angle_found = false;
     int stepdelay = 300;
-    int previous_distance = 10; //or whatever the distance between the start pos and wall is 
+   
 
     //moves it to start pos
     rotate_left(motorSpeed / 1.3);
-    delay(duration_90degree);
+    delay(duration_90degree/3);
 
     while (angle_found  == false){
-        found = false
-        n = 0;
-        rotate_right(motorSpeed / 3);
-        delay(duration_90degree/10);
+        bool found = false;
+        int n = 0;
+        rotate_right(motorSpeed / 2.5);
+        delay(duration_90degree/17);
         distance_cm = mySensor.distance();
+        Serial.println(distance_cm);
         //detected something
         //2 methods of detecting a block below, comment one out 
 
         //simple check distance 
-        if (distance_cm <= 20) { //change the 20
+        if (distance_cm <= 30) { //change the 20
             angle_found = true;
+            int steps_to_travel = distance_cm;
 
         //look for step change 
-        // if ((distance_cm - previous_distance)>8){ //change 8 to tested value 
-        //     angle_found = true;
-        //     previous_distance = distance_cm;
-
-            while found == false{
-                if (distance_cm <= 10) {
-                    collectIfInRange();
-                    found = true;
-
+            while (found == false){
+              distance_cm = mySensor.distance();
+              Serial.println(distance_cm);
+                if (distance_cm<8){
+                   collectIfInRange();
+                   found = true;
                 }
                 else {
-                    forwards(motorSpeed/3);
-                    delay(stepdelay);
-                    distance_cm = mySensor.distance();
-                    n++;
-                    if (n>10){
-                        angle_found = false;
-                        found = true;
-                        backwards(motorSpeed);
-                        delay(10*stepdelay);   
+                        n++;
+                        forwards(motorSpeed/2);
+                        delay(stepdelay);
                     }
                 }
             }
-        } 
+        }
+        //Return to the start of junction 3
+        for (int i = 0; n; i++){
+            backwards(motorSpeed/2);
+            delay(stepdelay);
+        }
+        
     }
-}
 
 /******************** INDICATOR LEDS *********************/
 void toggleCoarseLED()

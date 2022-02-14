@@ -559,7 +559,6 @@ void close_servo()
 
 /************************* SEARCH FUNCTION ***********************************/
 void search(){
-    bool IfFinding = true;
     bool angle_found = false;
     int stepdelay = 300;
    
@@ -574,19 +573,15 @@ void search(){
         rotate_right(motorSpeed / 2.5);
         delay(duration_90degree/17);
         distance_cm = mySensor.distance();
-        Serial.println(distance_cm);
         //detected something
         //2 methods of detecting a block below, comment one out 
 
         //simple check distance 
         if (distance_cm <= 30) { //change the 20
             angle_found = true;
-            int steps_to_travel = distance_cm;
-
         //look for step change 
             while (found == false){
               distance_cm = mySensor.distance();
-              Serial.println(distance_cm);
                 if (distance_cm<8){
                    collectIfInRange();
                    found = true;

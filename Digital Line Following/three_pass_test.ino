@@ -563,6 +563,8 @@ void search(){
     bool angle_found = false;
     int stepdelay = 300;
     int n = 0;
+    backwards(motorSpeed);
+    delay(600);
    
 
     //moves it to start pos

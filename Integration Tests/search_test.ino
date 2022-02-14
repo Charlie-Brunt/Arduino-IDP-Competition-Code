@@ -108,13 +108,13 @@ void loop()
             loopState = LOOP_STATE_STOPPED;
     }
 
-    if (loopState == LOOP_STATE_STARTED)
-    {
+    //if (loopState == LOOP_STATE_STARTED)
+    //{
         /************************ MAIN PROGRAM STARTS HERE ************************/
         
         search();
         delay(10000000);
-    }
+    //}
 
 }
 /******************************** MOVEMENT FUNCTIONS ********************************/
@@ -298,14 +298,15 @@ void search(){
 
     //moves it to start pos
     rotate_left(motorSpeed / 1.3);
-    delay(duration_90degree/4);
+    delay(duration_90degree/3);
 
     while (angle_found  == false){
         bool found = false;
         int n = 0;
-        rotate_right(motorSpeed / 3);
-        delay(duration_90degree/10);
+        rotate_right(motorSpeed / 2.5);
+        delay(duration_90degree/17);
         distance_cm = mySensor.distance();
+        Serial.println(distance_cm);
         //detected something
         //2 methods of detecting a block below, comment one out 
 
@@ -316,12 +317,15 @@ void search(){
 
         //look for step change 
             while (found == false){
-                if (n>steps_to_travel){
+              distance_cm = mySensor.distance();
+              Serial.println(distance_cm);
+                //if (n>steps_to_travel){
+                if (distance_cm<8){
                    collectIfInRange();
                    found = true;
                 }
                 else {
-                         n++;
+                        n++;
                         forwards(motorSpeed/2);
                         delay(stepdelay);
                     }
@@ -329,4 +333,3 @@ void search(){
             }
         } 
     }
-}

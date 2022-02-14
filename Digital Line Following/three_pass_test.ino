@@ -37,6 +37,7 @@ int loopState = LOOP_STATE_STOPPED;
 // IR sensor setup
 SharpIR mySensor = SharpIR(IRPin, model);
 int distance_cm;
+int prev_distance;
 
 // Line sensor setup
 int LineSensor1;
@@ -162,7 +163,7 @@ void loop()
 void forwards(int speed)
 {
     motor1->setSpeed(speed);
-    motor2->setSpeed(speed);
+    motor2->setSpeed(0.97*speed);
     motor1->run(FORWARD);
     motor2->run(FORWARD);
     motionLED();
@@ -171,7 +172,7 @@ void forwards(int speed)
 void backwards(int speed)
 {
     motor1->setSpeed(speed);
-    motor2->setSpeed(speed);
+    motor2->setSpeed(0.97*speed);
     motor1->run(BACKWARD);
     motor2->run(BACKWARD);
     motionLED();
@@ -342,8 +343,8 @@ void journeyLogic()
             junctionCounter = junction2;
             journeyCounter = journey3;
             break;
-        break;
         }
+        break;
 
     case journey3:
         switch (junctionCounter)
@@ -355,9 +356,8 @@ void journeyLogic()
             break;
         case junction3:
             stop();
-            DistanceSensor = true;
+            search();
             junctionCounter = junction2return;
-            IfRotate = true; 
             break;
         case junction2return:
             forwards(motorSpeed);
@@ -560,49 +560,65 @@ void close_servo()
 
 /************************* SEARCH FUNCTION ***********************************/
 void search(){
+    bool IfFinding = true;
     bool angle_found = false;
     int stepdelay = 300;
     int n = 0;
     backwards(motorSpeed);
-    delay(600);
+    delay(1200);
     stop();
-    delay(500);
+
     //moves it to start pos
     rotate_left(motorSpeed / 1.3);
     delay(duration_90degree/3);
+
+    prev_distance = 50;
 
     while (angle_found  == false){
         bool found = false;
         rotate_right(motorSpeed / 2.5);
         delay(duration_90degree/17);
         distance_cm = mySensor.distance();
+        Serial.println(distance_cm);
         //detected something
         //2 methods of detecting a block below, comment one out 
 
         //simple check distance 
-        if (distance_cm <= 30) { //change the 20
+        if ((distance_cm - prev_distance <= 10) && (distance_cm < 40)) { //change the 20
             angle_found = true;
+            int steps_to_travel = distance_cm;
+        
         //look for step change 
-            while (found == false){
-              distance_cm = mySensor.distance();
-                if (distance_cm<8){
-                   collectIfInRange();
-                   found = true;
-                }
-                else {
-                        n++;
-                        forwards(motorSpeed/2);
-                        delay(stepdelay);
-                    }
-                }
+//            while (found == false){
+//              distance_cm = mySensor.distance();
+//              // Serial.println(distance_cm);
+//                if (distance_cm<8){
+//                   collectIfInRange();
+//                   found = true;
+//                }
+//                else {
+//                        n++;
+//                        forwards(motorSpeed/2);
+//                        delay(stepdelay);
+//                    }
+//                }
+                forwards(motorSpeed/2);
+                delay(10000);
+                stop();
+                close_servo();
             }
+            prev_distance = distance_cm;
         }
         //Return to the start of junction 3
-        for (int i = 0; n; i++){
-            backwards(motorSpeed/2);
-            delay(stepdelay);
-        }
-        
+//        for (int i = 0; i<n/2; i++){
+//            backwards(motorSpeed/2);
+//            delay(stepdelay);
+//        }
+        backwards(motorSpeed/2);
+        delay(6000);
+        stop();
+    DistanceSensor = false;
+    IfRotate = true; 
     }
 
 /******************** INDICATOR LEDS *********************/

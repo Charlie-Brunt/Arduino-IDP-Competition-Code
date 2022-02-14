@@ -294,7 +294,7 @@ void search(){
     bool IfFinding = true;
     bool angle_found = false;
     int stepdelay = 300;
-   
+    int n = 0;  
 
     //moves it to start pos
     rotate_left(motorSpeed / 1.3);
@@ -302,7 +302,6 @@ void search(){
 
     while (angle_found  == false){
         bool found = false;
-        int n = 0;
         rotate_right(motorSpeed / 2.5);
         delay(duration_90degree/17);
         distance_cm = mySensor.distance();
@@ -318,7 +317,7 @@ void search(){
         //look for step change 
             while (found == false){
               distance_cm = mySensor.distance();
-              Serial.println(distance_cm);
+              // Serial.println(distance_cm);
                 if (distance_cm<8){
                    collectIfInRange();
                    found = true;
@@ -332,9 +331,11 @@ void search(){
             }
         }
         //Return to the start of junction 3
-        for (int i = 0; n; i++){
+        Serial.println(n);
+        for (int i = 0; i<n; i++){
             backwards(motorSpeed/2);
             delay(stepdelay);
         }
+        stop();
         
     }

@@ -38,13 +38,14 @@ int loopState = LOOP_STATE_STOPPED;
 SharpIR mySensor = SharpIR(IRPin, model);
 int distance_cm;
 int prev_distance;
+int prev_distance2;
 
 // Line sensor setup
 int LineSensor1;
 int LineSensor2;
 
 // Flags, state variables
-int junctionCounter = 0;
+int junctionCounter = 3;  // default 0
 #define startJunction 0   // for passing out of start box
 #define junction1 1       // for when passing deliver junction on outwards journey
 #define junction2 2       // for second junction
@@ -53,7 +54,7 @@ int junctionCounter = 0;
 #define endJunction 5     // for passing into start box
 #define junction2return 6
 
-int journeyCounter = 1;
+int journeyCounter = 3; // default 1
 #define journey1 1
 #define journey2 2
 #define journey3 3
@@ -163,7 +164,7 @@ void loop()
 void forwards(int speed)
 {
     motor1->setSpeed(speed);
-    motor2->setSpeed(0.97*speed);
+    motor2->setSpeed(0.9*speed);
     motor1->run(FORWARD);
     motor2->run(FORWARD);
     motionLED();
@@ -172,7 +173,7 @@ void forwards(int speed)
 void backwards(int speed)
 {
     motor1->setSpeed(speed);
-    motor2->setSpeed(0.97*speed);
+    motor2->setSpeed(0.9*speed);
     motor1->run(BACKWARD);
     motor2->run(BACKWARD);
     motionLED();
@@ -407,7 +408,6 @@ void updateLineSensors()
 
 void red_box()
 {   
-    toggleCoarseLED();
     forwards(motorSpeed / 1.5);
     delay(duration_delivery);
     rotate_right(motorSpeed/1.3);
@@ -418,6 +418,7 @@ void red_box()
     stop();
     delay(1000);
     open_servo();
+    toggleCoarseLED();
     Ifdeliver = false;
     backwards(motorSpeed/2);
     delay(duration_delivery);
@@ -438,12 +439,12 @@ void red_box()
         updateLineSensors();
         while (LineSensor2 == LOW){
             updateLineSensors();
-            rotate_right(motorSpeed/2);
+            rotate_right(motorSpeed/1.5);
         }
         stop();
         open_servo();
-        backwards(motorSpeed);
-        delay(700);
+        // backwards(motorSpeed);
+        // delay(700);
         
     }
     stop();
@@ -451,7 +452,6 @@ void red_box()
 
 void blue_box()
 {
-    toggleFineLED();
     forwards(motorSpeed /1.5);
     delay(duration_delivery);
     rotate_left(motorSpeed/1.5);
@@ -462,6 +462,7 @@ void blue_box()
     stop();
     delay(1000);
     open_servo();
+    toggleFineLED();
     Ifdeliver = false;
     backwards(motorSpeed/1.8);
     delay(duration_delivery);
@@ -482,12 +483,12 @@ void blue_box()
         updateLineSensors();
         while (LineSensor1 == LOW){
             updateLineSensors();
-            rotate_left(motorSpeed/2);
+            rotate_left(motorSpeed/1.5);
         }
         stop();
         open_servo();
-        backwards(motorSpeed);
-        delay(700);
+        // backwards(motorSpeed);
+        // delay(700);
     }
     stop();
 }
@@ -572,8 +573,9 @@ void search(){
     rotate_left(motorSpeed / 1.3);
     delay(duration_90degree/3);
 
-    prev_distance = 50;
-
+    prev_distance = 0;
+    prev_distance2 = 0;
+    
     while (angle_found  == false){
         bool found = false;
         rotate_right(motorSpeed / 2.5);
@@ -584,9 +586,11 @@ void search(){
         //2 methods of detecting a block below, comment one out 
 
         //simple check distance 
-        if ((distance_cm - prev_distance <= 10) && (distance_cm < 40)) { //change the 20
+        if (distance_cm + prev_distance + prev_distance2 > 160) {
+            // previous condition ((distance_cm - prev_distance2 <= 10) && (distance_cm < 30) && (abs(distance_cm - prev_distance) <= 2))
             angle_found = true;
             int steps_to_travel = distance_cm;
+
         
         //look for step change 
 //            while (found == false){
@@ -607,7 +611,8 @@ void search(){
                 stop();
                 close_servo();
             }
-            prev_distance = distance_cm;
+            prev_distance2 = prev_distance;
+            prev_distance = distance_cm;            
         }
         //Return to the start of junction 3
 //        for (int i = 0; i<n/2; i++){

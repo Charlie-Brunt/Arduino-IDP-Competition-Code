@@ -5,7 +5,7 @@
 // Include the library:
 
 // Define model and input pin:
-#define IRPin A2
+#define IRPin A0
 #define model 1080
 
 // Create variable to store the distance:

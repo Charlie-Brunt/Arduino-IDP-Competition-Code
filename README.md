@@ -21,11 +21,12 @@ Arduino Uno Wifi Rev 2 code for "The Thing" including test programs for testing 
 - [x] Integrate all modules to date
 - [x] Optimise and improve consistency of deliver_block_test
 - [x] Write first competition program
-- [ ] Write third pass search, store, fetch algorithm
+- [x] Write third pass search, store, fetch algorithm
+- [x] Implement search into program and test
 - [ ] Write block identification code
-- [ ] Call functions from .cpp and .h files
 - [ ] Finalise main program and implement thorough testing
-- [ ] Backup program
+- [ ] Refactor code into modules
+- [ ] Backup program if all else fails
 ## Files
 
 ### Component Tests

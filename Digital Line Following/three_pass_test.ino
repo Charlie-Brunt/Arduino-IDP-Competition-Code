@@ -343,6 +343,7 @@ void journeyLogic()
             journeyCounter = journey3;
             break;
         break;
+        }
 
     case journey3:
         switch (junctionCounter)
@@ -561,6 +562,7 @@ void close_servo()
 void search(){
     bool angle_found = false;
     int stepdelay = 300;
+    int n = 0;
    
 
     //moves it to start pos
@@ -569,7 +571,6 @@ void search(){
 
     while (angle_found  == false){
         bool found = false;
-        int n = 0;
         rotate_right(motorSpeed / 2.5);
         delay(duration_90degree/17);
         distance_cm = mySensor.distance();

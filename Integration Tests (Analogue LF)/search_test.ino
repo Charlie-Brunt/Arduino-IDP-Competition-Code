@@ -332,7 +332,7 @@ void search(){
             }
         }
         //Return to the start of junction 3
-        for (i = 0, n, i++){
+        for (int i = 0; n; i++){
             backwards(motorSpeed/2);
             delay(stepdelay);
         }

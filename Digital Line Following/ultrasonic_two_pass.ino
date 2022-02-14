@@ -9,7 +9,7 @@
 #define leftIn 6    // left IR sensor
 #define rightIn 5   // right IR sensor
 #define echoPin 2    // ultrasonic sensor I
-#define triggerPin 3 // ultrasonic sensor II
+#define trigPin 3 // ultrasonic sensor II
 #define coarseLEDpin 1
 #define fineLEDpin 0
 #define pushButtonPin 7
@@ -36,7 +36,11 @@ int loopState = LOOP_STATE_STOPPED;
 
 // IR sensor setup
 SharpIR mySensor = SharpIR(IRPin, model);
-int distance_cm;
+int distance_IR;
+
+// US sensor setup
+long duration; // variable for the duration of sound wave travel
+int distance_US; // variable for the distance measurement
 
 // Line sensor setup
 int LineSensor1;
@@ -69,6 +73,7 @@ bool Return = false;
 const float motorSpeed = 255; // Adjust motor speed here
 const int duration_90degree = 2300;
 const int duration_delivery = 1600;
+const int identificationRange = 15;  // Ultrasonic distance parameter
 
 // function definitions
 void forwards();
@@ -92,6 +97,7 @@ void blue_box();
 void red_box();
 void collectIfInRange_1();
 void collectIfInRange_2();
+void identifyBlock();
 
 void setup()
 {
@@ -101,6 +107,8 @@ void setup()
     pinMode(rightIn, INPUT);
     pinMode(coarseLEDpin, OUTPUT);
     pinMode(fineLEDpin, OUTPUT);
+    pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
+    pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
     myservo.attach(9);
     Serial.begin(9600);
     Serial.println("Ready!");
@@ -125,7 +133,7 @@ void loop()
     {
         /************************ MAIN PROGRAM STARTS HERE ************************/
         updateLineSensors();
-        distance_cm = mySensor.distance();
+        distance_IR = mySensor.distance();
         
         if (IfRotate == true)
         {
@@ -431,7 +439,6 @@ void updateLineSensors()
 
 void red_box()
 {   
-    toggleCoarseLED();
     forwards(motorSpeed / 1.5);
     delay(duration_delivery);
     rotate_right(motorSpeed/1.3);
@@ -443,6 +450,8 @@ void red_box()
     delay(1000);
     open_servo();
     Ifdeliver = false;
+    toggleCoarseLED();
+    IfCoarse = false;
     backwards(motorSpeed/2);
     delay(duration_delivery);
     stop();
@@ -475,7 +484,6 @@ void red_box()
 
 void blue_box()
 {
-    toggleFineLED();
     forwards(motorSpeed /1.5);
     delay(duration_delivery);
     rotate_left(motorSpeed/1.5);
@@ -486,6 +494,7 @@ void blue_box()
     stop();
     delay(1000);
     open_servo();
+    toggleFineLED();
     Ifdeliver = false;
     backwards(motorSpeed/1.8);
     delay(duration_delivery);
@@ -518,7 +527,7 @@ void blue_box()
 /************************ DETECTION ***************************/
 void collectIfInRange()
 {
-    if (distance_cm <= 10)
+    if (distance_IR <= 10)
     {
         stop();
         delay(500);
@@ -603,8 +612,43 @@ void motionLED()
 }
 
 /******************************** IDENTIFICATION ROUTINE ************************************/
-void identifyBLock() {
+void identifyBlock() {
     switch (journeyCounter) {
-        case journey1
+        case journey1:
+            backwards(motorSpeed/2);
+            delay(1000);
+            distance_IR = mySensor.distance();
+            while (distance_IR < identificationRange) {
+                backwards(motorSpeed/2);
+                getDistanceUS();
+                if (distance_US <= 30) {
+                    IfCoarse = true;
+                    break;  // break if condition met, else continue sensing until out of range
+                }
+            stop();
+            }
+            stop();
+            break;
+        case journey2:
+            break;
+        case journey3:
+            break;
     }
+}
+
+void getDistanceUS() {
+    
+    // Clears the trigPin condition
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+
+    // Sets the trigPin HIGH (ACTIVE) for 10 microseconds
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+
+    // Reads the echoPin, returns the sound wave travel time in microseconds
+    duration = pulseIn(echoPin, HIGH);
+
+    distance_US = duration * 0.034 / 2; // Speed of sound wave divided by 2 (go and back)
 }

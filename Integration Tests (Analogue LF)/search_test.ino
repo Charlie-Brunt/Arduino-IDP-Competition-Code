@@ -319,7 +319,6 @@ void search(){
             while (found == false){
               distance_cm = mySensor.distance();
               Serial.println(distance_cm);
-                //if (n>steps_to_travel){
                 if (distance_cm<8){
                    collectIfInRange();
                    found = true;
@@ -331,5 +330,11 @@ void search(){
                     }
                 }
             }
-        } 
+        }
+        //Return to the start of junction 3
+        for (i = 0, n, i++){
+            backwards(motorSpeed/2);
+            delay(stepdelay);
+        }
+        
     }

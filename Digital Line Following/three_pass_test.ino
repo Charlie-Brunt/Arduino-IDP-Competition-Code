@@ -565,8 +565,8 @@ void search(){
     int n = 0;
     backwards(motorSpeed);
     delay(600);
-   
-
+    stop();
+    delay(500);
     //moves it to start pos
     rotate_left(motorSpeed / 1.3);
     delay(duration_90degree/3);

@@ -69,7 +69,7 @@ bool IfRotate = false;
 bool IsOffLine = false;
 bool Ifdeliver = false;
 bool Ifdetected = false;
-bool DistanceSensor = false;  // needs a rename 
+bool IfCollect = false;  // needs a rename 
 bool Return = false;
 bool Meetjunction = false;
 
@@ -155,7 +155,7 @@ void loop()
             line_follow();
         }
 
-        if (DistanceSensor == true) {
+        if (IfCollect == true) {
             if (journeyCounter == journey1) {
                 collectIfInRange_1();
             }
@@ -337,8 +337,6 @@ void journeyLogic()
             break;
         case junction2:
             stop();
-            backwards(motorSpeed/2);
-            delay(500);
             identifyBlock();
             junctionCounter = deliverJunction;
             break;
@@ -361,7 +359,7 @@ void journeyLogic()
             break;
         case junction3:
             stop();
-            DistanceSensor = true;
+            IfCollect = true;
             junctionCounter = junction2return;
             break;
         case junction2return:
@@ -494,7 +492,7 @@ void blue_box()
 {
     forwards(motorSpeed /1.5);
     delay(duration_delivery);
-    rotate_left(motorSpeed/1.5);
+    rotate_left(motorSpeed/1.3);
     delay(duration_90degree);
     stop();
     forwards(motorSpeed / 1.5);
@@ -534,22 +532,10 @@ void blue_box()
     stop();
 }
 /************************ DETECTION ***************************/
-void collectIfInRange()
-{
-    stop();
-    delay(500);
-    close_servo();
-}
-
 void collectIfInRange_1() 
 {
-    stop();
-    delay(500);
     close_servo();
-    DistanceSensor = false;
-    forwards(motorSpeed/2);
-    delay(800);
-    IfRotate = true;
+    IfCollect = false;
 }
 
 void collectIfInRange_2()
@@ -557,7 +543,7 @@ void collectIfInRange_2()
     stop();
     delay(500);
     close_servo();
-    DistanceSensor = false;
+    IfCollect = false;
     backwards(motorSpeed);
     delay(600);
     stop();
@@ -629,7 +615,7 @@ void search(){
             prev_distance2 = prev_distance;
             prev_distance = distance_cm;            
         }
-    DistanceSensor = false;
+    IfCollect = false;
     IfRotate = true; 
     }
 
@@ -641,9 +627,9 @@ void motionLED()
 
 /******************************** IDENTIFICATION ROUTINE ************************************/
 void identifyBlock() {
-    if (journeyCounter == journey1){
+    if (journeyCounter == journey1) {
         close_servo();
-        rotate_right(motorSpeed/2);
+        rotate_right(motorSpeed/1.3);
         delay(duration_90degree);
         stop();
         open_servo();
@@ -658,10 +644,16 @@ void identifyBlock() {
                 break;
             }
         }
-        forards(motorSpeed/2);
+        forwards(motorSpeed/2);
         delay(duration1);
         stop();
         close_servo();
+        if (IfCoarse == true){
+            digitalWrite(coarseLEDpin, HIGH);
+        }
+        else {
+            digitalWrite(fineLEDpin, HIGH);
+        }
         IfRotate = true;
 
     }

@@ -49,7 +49,7 @@ int LineSensor1;
 int LineSensor2;
 
 // Counters
-int junctionCounter = 3;  // default 0
+int junctionCounter = 0;  // default 0
 #define startJunction 0   // for passing out of start box
 #define junction1 1       // for when passing deliver junction on outwards journey
 #define junction2 2       // for second junction
@@ -58,7 +58,7 @@ int junctionCounter = 3;  // default 0
 #define endJunction 5     // for passing into start box
 #define junction2return 6
 
-int journeyCounter = 3; // default 1
+int journeyCounter = 1; // default 1
 #define journey1 1
 #define journey2 2
 #define journey3 3
@@ -93,8 +93,6 @@ void close_servo();
 void open_servo();
 void journeyLogic();
 void search();
-void toggleCoarseLED();
-void toggleFineLED();
 void motionLED();
 void blue_box();
 void red_box();
@@ -175,7 +173,7 @@ void loop()
 void forwards(int speed)
 {
     motor1->setSpeed(speed);
-    motor2->setSpeed(0.9*speed);
+    motor2->setSpeed(speed/1.07);
     motor1->run(FORWARD);
     motor2->run(FORWARD);
     motionLED();
@@ -184,7 +182,7 @@ void forwards(int speed)
 void backwards(int speed)
 {
     motor1->setSpeed(speed);
-    motor2->setSpeed(0.9*speed);
+    motor2->setSpeed(speed/1.07);
     motor1->run(BACKWARD);
     motor2->run(BACKWARD);
     motionLED();
@@ -342,7 +340,6 @@ void journeyLogic()
             backwards(motorSpeed/2);
             delay(500);
             identifyBlock();
-            DistanceSensor = true;
             junctionCounter = deliverJunction;
             break;
         case deliverJunction:
@@ -364,13 +361,16 @@ void journeyLogic()
             break;
         case junction3:
             stop();
-            identifyBlock();
             DistanceSensor = true;
             junctionCounter = junction2return;
             break;
         case junction2return:
+            stop();
+            open_servo();
+            identifyBlock();
+            close_servo();
             forwards(motorSpeed);
-            delay(1000);
+            delay(700);
             junctionCounter = deliverJunction;
             break;
         case deliverJunction:
@@ -452,15 +452,15 @@ void red_box()
     rotate_right(motorSpeed/1.3);
     delay(duration_90degree);
     stop();
-    forwards(motorSpeed / 2);
+    forwards(motorSpeed / 1.5);
     delay(duration_delivery);
     stop();
     delay(1000);
     open_servo();
-    toggleCoarseLED();
+    digitalWrite(coarseLEDpin, LOW);
     Ifdeliver = false;
     IfCoarse = false;
-    backwards(motorSpeed/2);
+    backwards(motorSpeed/1.5);
     delay(duration_delivery);
     stop();
     close_servo();
@@ -470,7 +470,7 @@ void red_box()
         updateLineSensors();
         while (LineSensor1 == LOW){
             updateLineSensors();
-            rotate_right(motorSpeed/2);
+            rotate_left(motorSpeed/2);
         }
     }
     else {
@@ -497,15 +497,15 @@ void blue_box()
     rotate_left(motorSpeed/1.5);
     delay(duration_90degree);
     stop();
-    forwards(motorSpeed / 2);
+    forwards(motorSpeed / 1.5);
     delay(duration_delivery);
     stop();
     delay(1000);
     open_servo();
-    toggleFineLED();
+    digitalWrite(fineLEDpin, LOW);
     Ifdeliver = false;
     IfCoarse = false;
-    backwards(motorSpeed/1.8);
+    backwards(motorSpeed/1.5);
     delay(duration_delivery);
     stop();
     close_servo();
@@ -538,12 +538,6 @@ void collectIfInRange()
 {
     stop();
     delay(500);
-    if (IfCoarse == true) {
-        toggleCoarseLED();
-    } 
-    else {
-        toggleFineLED();
-    }
     close_servo();
 }
 
@@ -551,12 +545,6 @@ void collectIfInRange_1()
 {
     stop();
     delay(500);
-    if (IfCoarse == true) {
-        toggleCoarseLED();
-    } 
-    else {
-        toggleFineLED();
-    }
     close_servo();
     DistanceSensor = false;
     forwards(motorSpeed/2);
@@ -568,12 +556,6 @@ void collectIfInRange_2()
 {
     stop();
     delay(500);
-    if (IfCoarse == true) {
-        toggleCoarseLED();
-    } 
-    else {
-        toggleFineLED();
-    }
     close_servo();
     DistanceSensor = false;
     backwards(motorSpeed);
@@ -606,78 +588,52 @@ void search(){
     bool angle_found = false;
     int stepdelay = 300;
     int n = 0;
+    unsigned long timer1;
     backwards(motorSpeed);
     delay(1200);
     stop();
 
     //moves it to start pos
     rotate_left(motorSpeed / 1.3);
-    delay(duration_90degree/3);
+    delay(duration_90degree/2.5);
 
     prev_distance = 0;
     prev_distance2 = 0;
-    
+
+    timer1 = millis();
     while (angle_found  == false){
-        bool found = false;
+        bool found = false;        
         rotate_right(motorSpeed / 2.5);
         delay(duration_90degree/17);
         distance_cm = mySensor.distance();
         Serial.println(distance_cm);
         //detected something
         //2 methods of detecting a block below, comment one out 
-
+        if (millis()- timer1 > 6000) {
+          break;
+        }
         //simple check distance 
-        if (distance_cm + prev_distance + prev_distance2 > 160) {
+        if (distance_cm + prev_distance + prev_distance2 > 150) {
             // previous condition ((distance_cm - prev_distance2 <= 10) && (distance_cm < 30) && (abs(distance_cm - prev_distance) <= 2))
+            delay(200);
             angle_found = true;
             int steps_to_travel = distance_cm;
-
-        
-        //look for step change 
-//            while (found == false){
-//              distance_cm = mySensor.distance();
-//              // Serial.println(distance_cm);
-//                if (distance_cm<8){
-//                   collectIfInRange();
-//                   found = true;
-//                }
-//                else {
-//                        n++;
-//                        forwards(motorSpeed/2);
-//                        delay(stepdelay);
-//                    }
-//                }
-                forwards(motorSpeed/2);
-                delay(10000);
-                stop();
-                close_servo();
+            forwards(motorSpeed/2);
+            delay(10000);
+            stop();
+            close_servo();
+            backwards(motorSpeed/2);
+            delay(5000);
+            stop();
             }
             prev_distance2 = prev_distance;
             prev_distance = distance_cm;            
         }
-        //Return to the start of junction 3
-//        for (int i = 0; i<n/2; i++){
-//            backwards(motorSpeed/2);
-//            delay(stepdelay);
-//        }
-        backwards(motorSpeed/2);
-        delay(6000);
-        stop();
     DistanceSensor = false;
     IfRotate = true; 
     }
 
 /******************** INDICATOR LEDS *********************/
-void toggleCoarseLED()
-{
-    digitalWrite(coarseLEDpin, !digitalRead(coarseLEDpin));
-}
-
-void toggleFineLED()
-{
-    digitalWrite(fineLEDpin, !digitalRead(fineLEDpin));
-}
-
 void motionLED()
 {
     digitalWrite(motionLEDpin, HIGH);
@@ -685,21 +641,53 @@ void motionLED()
 
 /******************************** IDENTIFICATION ROUTINE ************************************/
 void identifyBlock() {
-    unsigned long t1 = millis();;
-    backwards(motorSpeed/2);
-    while(millis() - t1 < 5000) {
-        distance_US = getDistanceUS();
-        if (distance_US <= 30) {
-            IfCoarse = true;
-            break;
+    if (journeyCounter == journey1){
+        close_servo();
+        rotate_right(motorSpeed/2);
+        delay(duration_90degree);
+        stop();
+        open_servo();
+        unsigned long t1 = millis();
+        unsigned long duration1;
+        backwards(motorSpeed/2);
+        while(millis() - t1 < 3500) {
+            getDistanceUS();
+            duration1 = millis() - t1;
+            if (distance_US <= 30) {
+                IfCoarse = true;
+                break;
+            }
         }
+        forards(motorSpeed/2);
+        delay(duration1);
+        stop();
+        close_servo();
+        IfRotate = true;
+
     }
-    while(MeetJunction == false) {
-        updateLineSensors();
-        line_follow_until_junction();
+    else {
+        unsigned long t1 = millis();;
+        backwards(motorSpeed/2);
+        while(millis() - t1 < 3500) {
+            getDistanceUS();
+            if (distance_US <= 30) {
+                IfCoarse = true;
+                break;
+            }
+        }
+        while(Meetjunction == false) {
+            updateLineSensors();
+            line_follow_until_junction();
+        }
+        Meetjunction = false;
+        if (IfCoarse == true){
+            digitalWrite(coarseLEDpin, HIGH);
+        }
+        else {
+            digitalWrite(fineLEDpin, HIGH);
+        }
+        stop();
     }
-    Meetjunction = false;                
-    stop();
 }
 
 void getDistanceUS() {

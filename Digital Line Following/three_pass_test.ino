@@ -565,29 +565,34 @@ void search(){
     bool angle_found = false;
     int stepdelay = 300;
     int n = 0;
+    unsigned long timer1;
     backwards(motorSpeed);
     delay(1200);
     stop();
 
     //moves it to start pos
     rotate_left(motorSpeed / 1.3);
-    delay(duration_90degree/3);
+    delay(duration_90degree/2);
 
     prev_distance = 0;
     prev_distance2 = 0;
-    
+
+    time1 = millis();
     while (angle_found  == false){
-        bool found = false;
+        bool found = false;        
         rotate_right(motorSpeed / 2.5);
         delay(duration_90degree/17);
         distance_cm = mySensor.distance();
         Serial.println(distance_cm);
         //detected something
         //2 methods of detecting a block below, comment one out 
-
+        if (millis()- timer1 > 6000) {
+          break;
+        }
         //simple check distance 
-        if (distance_cm + prev_distance + prev_distance2 > 160) {
+        if (distance_cm + prev_distance + prev_distance2 > 150) {
             // previous condition ((distance_cm - prev_distance2 <= 10) && (distance_cm < 30) && (abs(distance_cm - prev_distance) <= 2))
+            delay(200);
             angle_found = true;
             int steps_to_travel = distance_cm;
 
@@ -610,6 +615,9 @@ void search(){
                 delay(10000);
                 stop();
                 close_servo();
+                backwards(motorSpeed/2);
+                delay(6000);
+                stop();
             }
             prev_distance2 = prev_distance;
             prev_distance = distance_cm;            
@@ -619,13 +627,10 @@ void search(){
 //            backwards(motorSpeed/2);
 //            delay(stepdelay);
 //        }
-        backwards(motorSpeed/2);
-        delay(6000);
-        stop();
     DistanceSensor = false;
     IfRotate = true; 
     }
-
+    
 /******************** INDICATOR LEDS *********************/
 void toggleCoarseLED()
 {

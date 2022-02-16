@@ -338,6 +338,13 @@ void journeyLogic()
             break;
         case junction2:
             stop();
+            backwards(MOTOR_SPEED/2);
+            delay(500);
+            stop();
+            close_servo();
+            forwards(MOTOR_SPEED);
+            delay(800);
+            stop();
             identifyBlock();
             junctionCounter = deliverJunction;
             break;
@@ -400,7 +407,7 @@ void journeyLogic()
             identifyBlock();
             close_servo();
             forwards(MOTOR_SPEED);
-            delay(700);
+            delay(500);
             junctionCounter = deliverJunction;
             break;
         case deliverJunction:
@@ -457,7 +464,7 @@ void red_box()
     forwards(MOTOR_SPEED / 1.5);
     delay(DURATION_DELIVERY);
     rotate_right(MOTOR_SPEED/1.3);
-    delay(DURATION_90_DEG);
+    delay(DURATION_90_DEG*0.9);
     stop();
     forwards(MOTOR_SPEED / 1.5);
     delay(DURATION_DELIVERY);
@@ -507,7 +514,7 @@ void blue_box()
     forwards(MOTOR_SPEED /1.5);
     delay(DURATION_DELIVERY);
     rotate_left(MOTOR_SPEED/1.3);
-    delay(DURATION_90_DEG);
+    delay(DURATION_90_DEG*0.9);
     stop();
     forwards(MOTOR_SPEED / 1.5);
     delay(DURATION_DELIVERY);
@@ -611,7 +618,7 @@ void search(){
 
     //moves it to start pos
     rotate_left(MOTOR_SPEED / 1.3);
-    delay(DURATION_90_DEG/2.5);
+    delay(DURATION_90_DEG/3);
 
     prev_distance = 0;
     prev_distance2 = 0;
@@ -619,27 +626,28 @@ void search(){
     timer1 = millis();
     while (angle_found  == false){
         bool found = false;        
-        rotate_right(MOTOR_SPEED / 2.5);
+        rotate_right(MOTOR_SPEED / 2.3);
         delay(DURATION_90_DEG/17);
         distance_cm = mySensor.distance();
-        Serial.println(distance_cm);
         //detected something
         //2 methods of detecting a block below, comment one out 
-        if (millis()- timer1 > 6000) {
+        if (millis() - timer1 > 5000) {
           break;
         }
         //simple check distance 
         if (distance_cm + prev_distance + prev_distance2 > 150) {
             // previous condition ((distance_cm - prev_distance2 <= 10) && (distance_cm < 30) && (abs(distance_cm - prev_distance) <= 2))
-            delay(200);
+            if ((millis() - timer1) < 2500) {
+              delay(150);
+            }
             angle_found = true;
             int steps_to_travel = distance_cm;
-            forwards(MOTOR_SPEED/2);
-            delay(10000);
+            forwards(MOTOR_SPEED/1.5);
+            delay(7000); // 10000
             stop();
             close_servo();
-            backwards(MOTOR_SPEED/2);
-            delay(5000);
+            backwards(MOTOR_SPEED/1.5);
+            delay(3500); // 5000
             stop();
             }
             prev_distance2 = prev_distance;
@@ -670,7 +678,6 @@ void motionLED()
  */
 void identifyBlock() {
     if (journeyCounter == journey1) {
-        close_servo();
         rotate_right(MOTOR_SPEED/1.3);
         delay(DURATION_90_DEG);
         stop();
@@ -678,7 +685,7 @@ void identifyBlock() {
         unsigned long t1 = millis();
         unsigned long duration1;
         backwards(MOTOR_SPEED/2);
-        while(millis() - t1 < 3500) {
+        while(millis() - t1 < 2500) {
             getDistanceUS();
             duration1 = millis() - t1;
             if (distance_US <= 30) {
@@ -687,7 +694,7 @@ void identifyBlock() {
             }
         }
         forwards(MOTOR_SPEED/2);
-        delay(duration1);
+        delay(duration1 + 250);
         stop();
         close_servo();
         if (Coarse == true){
@@ -702,7 +709,7 @@ void identifyBlock() {
     else {
         unsigned long t1 = millis();;
         backwards(MOTOR_SPEED/2);
-        while(millis() - t1 < 3500) {
+        while(millis() - t1 < 2500) {
             getDistanceUS();
             if (distance_US <= 30) {
                 Coarse = true;

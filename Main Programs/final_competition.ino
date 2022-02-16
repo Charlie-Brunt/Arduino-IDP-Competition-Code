@@ -166,6 +166,9 @@ void loop()
 }
 
 /************************** MOVEMENT *****************************/
+/**
+ * basic motion functions.
+ */
 void forwards(int speed)
 {
     motor1->setSpeed(speed);
@@ -247,7 +250,11 @@ void stop()
     digitalWrite(motionLEDpin, LOW);
 }
 /******************************** 180 TURN ********************************/
-
+/**
+ * rotate clockwise until meet the line again.
+ * use boolean Offline to ensure it will not detect the line at the very 
+ * beginning of rotation.
+ */
 
 void rotate180()
 {
@@ -272,6 +279,10 @@ void rotate180()
     }
 }
 /******************************** LINE FOLLOWING ALGORITHM ********************************/
+/**
+ * line following function used in the main loop.
+ * record junctions and call journeyLogic() to do certain tasks.
+ */
 void line_follow()
 {
     if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
@@ -292,6 +303,10 @@ void line_follow()
     }
 }
 
+/**
+ * line following function used when identifying blocks outside the main loop.
+ * stop when meet junction, then back to the main journey logic.
+ */
 void line_follow_until_junction()
 {
     if ((LineSensor1 == LOW) && (LineSensor2 == LOW))

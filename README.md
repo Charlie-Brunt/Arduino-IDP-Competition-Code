@@ -4,27 +4,6 @@
 By Amanda Ge and Charlie Brunt
 
 Arduino Uno Wifi Rev 2 code for "The Thing" including test programs for testing motors, servos, movement commands, line following and block detection.
-
-## To do
-
-- [x] Test motors, servos, line sensors
-- [x] Motion commands with serial control
-- [x] Line following algorithm
-- [x] Perfect 180s
-- [x] Push button / serial command + time delay to start program
-- [x] Three journey test protocol
-- [x] Switch-case structure
-- [x] Introduce decision-based LED signals and movement LED
-- [x] Write servo actuation code
-- [x] Write block detection code
-- [x] Fix deliver_block_test for first pass using timer 
-- [x] Integrate all modules to date
-- [x] Optimise and improve consistency of deliver_block_test
-- [x] Write first competition program
-- [x] Write third pass search, store, fetch algorithm
-- [x] Implement search into program and test
-- [x] Write block identification code
-- [x] Finalise main program and implement thorough testing
 ## Files
 
 ### Component Tests
@@ -64,3 +43,24 @@ Post-first-competition tests with improved digital line following.
 Finalised code used for competitions.
 - **first_competition** - finalised first competition program scoring 80 pts
 - **final_competition** - finalised final competition program scoring 150 pts
+
+## To do
+
+- [x] Test motors, servos, line sensors
+- [x] Motion commands with serial control
+- [x] Line following algorithm
+- [x] Perfect 180s
+- [x] Push button / serial command + time delay to start program
+- [x] Three journey test protocol
+- [x] Switch-case structure
+- [x] Introduce decision-based LED signals and movement LED
+- [x] Write servo actuation code
+- [x] Write block detection code
+- [x] Fix deliver_block_test for first pass using timer 
+- [x] Integrate all modules to date
+- [x] Optimise and improve consistency of deliver_block_test
+- [x] Write first competition program
+- [x] Write third pass search, store, fetch algorithm
+- [x] Implement search into program and test
+- [x] Write block identification code
+- [x] Finalise main program and implement thorough testing

@@ -3,7 +3,7 @@
 Software files for "The Thing".
 Please see [final_competition](https://gitlab.com/t7191/software/-/blob/main/Main%20Programs/final_competition.ino) for our most up to date program.
 
-![The Thing](/Assets/Images/CADRender.jpg "The Thing")
+<img src="/Assets/Images/CADRender.jpg" width="60">
 
 ## System Diagram
 ![System Diagram](/Assets/Images/SystemDiagram.png "System Diagram")

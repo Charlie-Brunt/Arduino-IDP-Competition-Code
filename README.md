@@ -1,7 +1,7 @@
 # Group 105 "The Think Makers" IDP Software
 
 Software files for "The Thing".
-Please see "Main Programs" for first and final competition programs.
+Please see "final_competition_refactored" for our most up to date program.
 ## Files
 
 ### Component Tests
@@ -39,8 +39,10 @@ Post-first-competition tests with improved digital line following.
 - **two_pass_ultrasonic** - tests block identification with ultrasonic sensor
 ### Main Programs
 Finalised code used for competitions.
-- **first_competition** - finalised first competition program scoring 80 pts
-- **final_competition** - finalised final competition program scoring 150 pts
+- **first_competition** - first competition program scoring 80 pts
+- **final_competition** - final competition program scoring 150 pts
+- **final_competition_refactored** - finalised final competition program
+
 
 ## To do
 

@@ -63,12 +63,8 @@ int journeyCounter = 1; // default = 1
 #define journey2 2
 #define journey3 3
 
-// Booleans
+// Flags
 bool Coarse = false;
-bool Rotate = false;
-bool OffLine = false;
-bool Deliver = false;
-bool Collect = false;
 bool Return = false;
 bool AtJunction = false;
 
@@ -87,7 +83,6 @@ void turn_left_backwards();
 void rotate_left();
 void rotate_right();
 void updateLineSensors();
-void collectIfInRange();
 void close_servo();
 void open_servo();
 void journeyLogic();
@@ -95,12 +90,11 @@ void search();
 void motionLED();
 void blue_box();
 void red_box();
-void collectIfInRange_1();
-void collect_2();
 void identifyBlock();
 void getDistanceUS();
 void line_follow_until_junction();
 void line_follow();
+void deliver();
 
 void setup()
 {
@@ -137,33 +131,62 @@ void loop()
         updateLineSensors();
         distance_cm = mySensor.distance();
         
-        // Rotation, delivery and line following are exclusive events:
-        if (Rotate == true)
-        {
-            rotate180();
-        }
-        else if (Deliver == true) {
-            if (Coarse == true) {
-                red_box();
-            }
-            else {
-                blue_box();
-            }
-        }
-        else
-        {
-            line_follow();
-        }
+        // Line follow function is called until the interrupted by a junction
+        line_follow();
 
-        if (Collect == true) {
-            if (journeyCounter = journey2) {
-                collect_2();
-            }
-            else if (journeyCounter = journey3){
-                search();
-            }
-        }
+    }
+}
 
+/******************************** LINE FOLLOWING ALGORITHM ********************************/
+
+/**
+ * Line following function used in the main loop.
+ * Calls journeyLogic() every time a junction is reached in order to do certain tasks.
+ */
+
+void line_follow()
+{
+    if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
+    {
+        forwards(MOTOR_SPEED);
+    }
+    else if ((LineSensor1 == LOW) && (LineSensor2 == HIGH))
+    {
+        turn_right_forwards(MOTOR_SPEED, MOTOR_SPEED / 4);
+    }
+    else if ((LineSensor1 == HIGH) && (LineSensor2 == LOW))
+    {
+        turn_left_forwards(MOTOR_SPEED, MOTOR_SPEED / 4);
+    }
+    else if ((LineSensor1 == HIGH) && (LineSensor2 == HIGH))
+    {
+        journeyLogic();
+    }
+}
+
+/**
+ * line following function used when identifying blocks outside the main loop.
+ * Stop when junction reached, then back to the main journey logic.
+ */
+
+void line_follow_until_junction()
+{
+    if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
+    {
+        forwards(MOTOR_SPEED);
+    }
+    else if ((LineSensor1 == LOW) && (LineSensor2 == HIGH))
+    {
+        turn_right_forwards(MOTOR_SPEED, MOTOR_SPEED / 4);
+    }
+    else if ((LineSensor1 == HIGH) && (LineSensor2 == LOW))
+    {
+        turn_left_forwards(MOTOR_SPEED, MOTOR_SPEED / 4);
+    }
+    else if ((LineSensor1 == HIGH) && (LineSensor2 == HIGH))
+    {
+        stop();
+        AtJunction = true;
     }
 }
 
@@ -256,84 +279,18 @@ void stop()
 
 /**
  * Rotate clockwise until the line is detected again.
- * Use boolean Offline to ensure it will not detect the line at the very 
+ * Use a delay to ensure it will not detect the line at the very 
  * beginning of rotation.
  */
 
 void rotate180()
 {
-    if (OffLine == false)
-    {
-        rotate_right(MOTOR_SPEED);
-        delay(1000);
-        OffLine = true;
+    rotate_right(MOTOR_SPEED);
+    delay(1000);
+    while (LineSensor2 == LOW) {
+        rotate(MOTOR_SPEED);
     }
-    else
-    {
-        if (LineSensor2 == LOW)
-        {
-            rotate_right(MOTOR_SPEED);
-        }
-        else if (LineSensor2 == HIGH)
-        {
-            stop();
-            OffLine = false;
-            Rotate = false;
-        }
-    }
-}
-
-/******************************** LINE FOLLOWING ALGORITHM ********************************/
-
-/**
- * Line following function used in the main loop.
- * Calls journeyLogic() every time a junction is reached in order to do certain tasks.
- */
-
-void line_follow()
-{
-    if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
-    {
-        forwards(MOTOR_SPEED);
-    }
-    else if ((LineSensor1 == LOW) && (LineSensor2 == HIGH))
-    {
-        turn_right_forwards(MOTOR_SPEED, MOTOR_SPEED / 4);
-    }
-    else if ((LineSensor1 == HIGH) && (LineSensor2 == LOW))
-    {
-        turn_left_forwards(MOTOR_SPEED, MOTOR_SPEED / 4);
-    }
-    else if ((LineSensor1 == HIGH) && (LineSensor2 == HIGH))
-    {
-        journeyLogic();
-    }
-}
-
-/**
- * line following function used when identifying blocks outside the main loop.
- * Stop when junction reached, then back to the main journey logic.
- */
-
-void line_follow_until_junction()
-{
-    if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
-    {
-        forwards(MOTOR_SPEED);
-    }
-    else if ((LineSensor1 == LOW) && (LineSensor2 == HIGH))
-    {
-        turn_right_forwards(MOTOR_SPEED, MOTOR_SPEED / 4);
-    }
-    else if ((LineSensor1 == HIGH) && (LineSensor2 == LOW))
-    {
-        turn_left_forwards(MOTOR_SPEED, MOTOR_SPEED / 4);
-    }
-    else if ((LineSensor1 == HIGH) && (LineSensor2 == HIGH))
-    {
-        stop();
-        AtJunction = true;
-    }
+    stop();
 }
 
 /*********************** JOURNEY LOGIC ***********************/
@@ -375,7 +332,7 @@ void journeyLogic()
             break;
         case deliverJunction:  // deliver block
             stop();
-            Deliver = true;
+            deliver();
             junctionCounter = junction2;
             journeyCounter = journey2;
             break;
@@ -392,7 +349,12 @@ void journeyLogic()
             break;
         case junction3:  // collect block and rotate
             stop();
-            Collect = true;
+            delay(500);
+            close_servo();
+            backwards(MOTOR_SPEED);
+            delay(600);
+            stop();
+            rotate180();
             junctionCounter = junction2return;
             break;
         case junction2return:  // stop and identify block
@@ -406,7 +368,7 @@ void journeyLogic()
             break;
         case deliverJunction:  // deliver block
             stop();
-            Deliver = true;
+            deliver();
             junctionCounter = junction2;
             journeyCounter = journey3;
             break;
@@ -438,7 +400,7 @@ void journeyLogic()
         case deliverJunction:  // deliver block then return to start
             stop();
             Return = true;
-            Deliver = true;
+            deliver();
             junctionCounter = startJunction;
             break;
         case startJunction:  // stop inside start box
@@ -482,6 +444,17 @@ void updateLineSensors()
 
 /************************** DELIVERY ***************************/
 
+// Calls red_box() if the Coarse flag is set to true, otherwise calls blue_box()
+
+void deliver() {
+    if (Coarse == true) {
+                red_box();
+            }
+            else {
+                blue_box();
+            }
+}
+
 /**
  * Delivers block to red box and returns to start box if Return is true,
  * otherwise returns to line.
@@ -500,7 +473,6 @@ void red_box()
     delay(1000);
     open_servo();
     digitalWrite(coarseLEDpin, LOW);
-    Deliver = false;  // reset Deliver flag
     Coarse = false;  // reset Coarse flag
     backwards(MOTOR_SPEED/1.5);
     delay(DURATION_DELIVERY);
@@ -550,7 +522,6 @@ void blue_box()
     delay(1000);
     open_servo();
     digitalWrite(fineLEDpin, LOW);
-    Deliver = false;  // reset Deliver flag
     Coarse = false;  // reset Coarse flag
     backwards(MOTOR_SPEED/1.5);
     delay(DURATION_DELIVERY);
@@ -579,22 +550,6 @@ void blue_box()
         // delay(700);
     }
     stop();
-}
-
-/************************ COLLECTION ***************************/
-
-// Collection for journey 2
-
-void collect_2()
-{
-    stop();
-    delay(500);
-    close_servo();
-    Collect = false;
-    backwards(MOTOR_SPEED);
-    delay(600);
-    stop();
-    Rotate = true;
 }
 
 /*************************** SERVO ********************************/
@@ -680,9 +635,8 @@ void search(){
         prev_distance = distance_cm;            
         }
     
-    // reset collect flag and rotate
-    Collect = false;
-    Rotate = true; 
+    // rotate
+    rotate180();
     }
 
 /******************** INDICATOR LEDS *********************/
@@ -731,7 +685,7 @@ void identifyBlock() {
         else {
             digitalWrite(fineLEDpin, HIGH);
         }
-        Rotate = true;
+        rotate180();
 
     }
     else {

@@ -1,7 +1,7 @@
 # Group 105 "The Think Makers" IDP Software
 
 Software files for "The Thing".
-Please see "[final_competition_refactored](https://gitlab.com/t7191/software/-/blob/main/Main%20Programs/final_competition_refactored.ino)" for our most up to date program.
+Please see [final_competition_refactored](https://gitlab.com/t7191/software/-/blob/main/Main%20Programs/final_competition_refactored.ino) for our most up to date program.
 ## Files
 
 ### Component Tests

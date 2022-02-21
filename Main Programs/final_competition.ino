@@ -6,16 +6,16 @@
 #include <Servo.h>
 
 // Pin assignments
-#define leftIn 6    // left LF sensor
-#define rightIn 5   // right LF sensor
-#define echoPin 2    // ultrasonic sensor echo
+#define leftIn 6  // left LF sensor
+#define rightIn 5 // right LF sensor
+#define echoPin 2 // ultrasonic sensor echo
 #define trigPin 3 // ultrasonic sensor trigger
 #define coarseLEDpin 1
 #define fineLEDpin 0
 #define pushButtonPin 7
 #define motionLEDpin 13
 #define IRPin A0
-#define model 1080  // IR sensor model
+#define model 1080 // IR sensor model
 
 // Motor setup
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
@@ -41,7 +41,7 @@ int prev_distance;
 int prev_distance2;
 
 // US sensor setup
-long duration; // variable for the duration of sound wave travel
+long duration;   // variable for the duration of sound wave travel
 int distance_US; // variable for the distance measurement
 
 // Line sensor states
@@ -49,13 +49,13 @@ int LineSensor1;
 int LineSensor2;
 
 // Counters
-int junctionCounter = 0;   // default = 0
-#define startJunction 0    // passing out of start box
-#define junction1 1        // when passing Deliver junction on outwards journey
-#define junction2 2        // second junction
-#define junction3 3        // when reaching end search zone
-#define deliverJunction 4  // when delivering at Deliver junction
-#define endJunction 5      // passing into start box
+int junctionCounter = 0;  // default = 0
+#define startJunction 0   // passing out of start box
+#define junction1 1       // when passing Deliver junction on outwards journey
+#define junction2 2       // second junction
+#define junction3 3       // when reaching end search zone
+#define deliverJunction 4 // when delivering at Deliver junction
+#define endJunction 5     // passing into start box
 #define junction2return 6
 
 int journeyCounter = 1; // default = 1
@@ -105,7 +105,7 @@ void setup()
     pinMode(coarseLEDpin, OUTPUT);
     pinMode(fineLEDpin, OUTPUT);
     pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
-    pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
+    pinMode(echoPin, INPUT);  // Sets the echoPin as an INPUT
     myservo.attach(9);
     Serial.begin(9600);
     Serial.println("Ready!");
@@ -130,10 +130,9 @@ void loop()
         // update sensors
         updateLineSensors();
         distance_cm = mySensor.distance();
-        
+
         // Line follow function is called until the interrupted by a junction
         line_follow();
-
     }
 }
 
@@ -197,7 +196,7 @@ void line_follow_until_junction()
 void forwards(int speed)
 {
     motor1->setSpeed(speed);
-    motor2->setSpeed(speed/1.07);  // calibration
+    motor2->setSpeed(speed / 1.07); // calibration
     motor1->run(FORWARD);
     motor2->run(FORWARD);
     motionLED();
@@ -206,7 +205,7 @@ void forwards(int speed)
 void backwards(int speed)
 {
     motor1->setSpeed(speed);
-    motor2->setSpeed(speed/1.07);  // calibration
+    motor2->setSpeed(speed / 1.07); // calibration
     motor1->run(BACKWARD);
     motor2->run(BACKWARD);
     motionLED();
@@ -279,7 +278,7 @@ void stop()
 
 /**
  * Rotate clockwise until the line is detected again.
- * Use a delay to ensure it will not detect the line at the very 
+ * Use a delay to ensure it will not detect the line at the very
  * beginning of rotation.
  */
 
@@ -287,7 +286,8 @@ void rotate180()
 {
     rotate_right(MOTOR_SPEED);
     delay(1000);
-    while (LineSensor2 == LOW) {
+    while (LineSensor2 == LOW)
+    {
         rotate(MOTOR_SPEED);
     }
     stop();
@@ -308,19 +308,19 @@ void journeyLogic()
     case journey1:
         switch (junctionCounter)
         {
-        case startJunction:  // Pass start junction
+        case startJunction: // Pass start junction
             forwards(MOTOR_SPEED);
             junctionCounter = junction1;
             delay(800);
             break;
-        case junction1:  // Pass junction 1
+        case junction1: // Pass junction 1
             forwards(MOTOR_SPEED);
             junctionCounter = junction2;
             delay(800);
             break;
         case junction2: // collect and identify block
             stop();
-            backwards(MOTOR_SPEED/2);
+            backwards(MOTOR_SPEED / 2);
             delay(500);
             stop();
             close_servo();
@@ -330,7 +330,7 @@ void journeyLogic()
             identifyBlock();
             junctionCounter = deliverJunction;
             break;
-        case deliverJunction:  // deliver block
+        case deliverJunction: // deliver block
             stop();
             deliver();
             junctionCounter = junction2;
@@ -342,12 +342,12 @@ void journeyLogic()
     case journey2:
         switch (junctionCounter)
         {
-        case junction2:  // pass junction 2
+        case junction2: // pass junction 2
             forwards(MOTOR_SPEED);
             delay(500);
             junctionCounter = junction3;
             break;
-        case junction3:  // collect block and rotate
+        case junction3: // collect block and rotate
             stop();
             delay(500);
             close_servo();
@@ -357,7 +357,7 @@ void journeyLogic()
             rotate180();
             junctionCounter = junction2return;
             break;
-        case junction2return:  // stop and identify block
+        case junction2return: // stop and identify block
             stop();
             open_servo();
             identifyBlock();
@@ -366,7 +366,7 @@ void journeyLogic()
             delay(700);
             junctionCounter = deliverJunction;
             break;
-        case deliverJunction:  // deliver block
+        case deliverJunction: // deliver block
             stop();
             deliver();
             junctionCounter = junction2;
@@ -378,17 +378,17 @@ void journeyLogic()
     case journey3:
         switch (junctionCounter)
         {
-        case junction2:  // pass junction 2
+        case junction2: // pass junction 2
             forwards(MOTOR_SPEED);
             delay(500);
             junctionCounter = junction3;
             break;
-        case junction3:  // search the end box
+        case junction3: // search the end box
             stop();
             search();
             junctionCounter = junction2return;
             break;
-        case junction2return:  // stop and indentify block
+        case junction2return: // stop and indentify block
             stop();
             open_servo();
             identifyBlock();
@@ -397,13 +397,13 @@ void journeyLogic()
             delay(500);
             junctionCounter = deliverJunction;
             break;
-        case deliverJunction:  // deliver block then return to start
+        case deliverJunction: // deliver block then return to start
             stop();
             Return = true;
             deliver();
             junctionCounter = startJunction;
             break;
-        case startJunction:  // stop inside start box
+        case startJunction: // stop inside start box
             forwards(MOTOR_SPEED);
             delay(1650);
             stop();
@@ -446,13 +446,16 @@ void updateLineSensors()
 
 // Calls red_box() if the Coarse flag is set to true, otherwise calls blue_box()
 
-void deliver() {
-    if (Coarse == true) {
-                red_box();
-            }
-            else {
-                blue_box();
-            }
+void deliver()
+{
+    if (Coarse == true)
+    {
+        red_box();
+    }
+    else
+    {
+        blue_box();
+    }
 }
 
 /**
@@ -461,11 +464,11 @@ void deliver() {
  */
 
 void red_box()
-{   
+{
     forwards(MOTOR_SPEED / 1.5);
     delay(DURATION_DELIVERY);
-    rotate_right(MOTOR_SPEED/1.3);
-    delay(DURATION_90_DEG*0.9);
+    rotate_right(MOTOR_SPEED / 1.3);
+    delay(DURATION_90_DEG * 0.9);
     stop();
     forwards(MOTOR_SPEED / 1.5);
     delay(DURATION_DELIVERY);
@@ -473,33 +476,36 @@ void red_box()
     delay(1000);
     open_servo();
     digitalWrite(coarseLEDpin, LOW);
-    Coarse = false;  // reset Coarse flag
-    backwards(MOTOR_SPEED/1.5);
+    Coarse = false; // reset Coarse flag
+    backwards(MOTOR_SPEED / 1.5);
     delay(DURATION_DELIVERY);
     stop();
     close_servo();
-    if (Return == true) {
-        rotate_left(MOTOR_SPEED/1.3);
-        delay(DURATION_90_DEG*0.8);
+    if (Return == true)
+    {
+        rotate_left(MOTOR_SPEED / 1.3);
+        delay(DURATION_90_DEG * 0.8);
         updateLineSensors();
-        while (LineSensor1 == LOW){
+        while (LineSensor1 == LOW)
+        {
             updateLineSensors();
-            rotate_left(MOTOR_SPEED/2);
+            rotate_left(MOTOR_SPEED / 2);
         }
     }
-    else {
-        rotate_right(MOTOR_SPEED/1.3);
-        delay(DURATION_90_DEG*0.8);
+    else
+    {
+        rotate_right(MOTOR_SPEED / 1.3);
+        delay(DURATION_90_DEG * 0.8);
         updateLineSensors();
-        while (LineSensor2 == LOW){
+        while (LineSensor2 == LOW)
+        {
             updateLineSensors();
-            rotate_right(MOTOR_SPEED/1.5);
+            rotate_right(MOTOR_SPEED / 1.5);
         }
         stop();
         open_servo();
         // backwards(MOTOR_SPEED);
         // delay(700);
-        
     }
     stop();
 }
@@ -511,10 +517,10 @@ void red_box()
 
 void blue_box()
 {
-    forwards(MOTOR_SPEED /1.5);
+    forwards(MOTOR_SPEED / 1.5);
     delay(DURATION_DELIVERY);
-    rotate_left(MOTOR_SPEED/1.3);
-    delay(DURATION_90_DEG*0.9);
+    rotate_left(MOTOR_SPEED / 1.3);
+    delay(DURATION_90_DEG * 0.9);
     stop();
     forwards(MOTOR_SPEED / 1.5);
     delay(DURATION_DELIVERY);
@@ -522,27 +528,31 @@ void blue_box()
     delay(1000);
     open_servo();
     digitalWrite(fineLEDpin, LOW);
-    Coarse = false;  // reset Coarse flag
-    backwards(MOTOR_SPEED/1.5);
+    Coarse = false; // reset Coarse flag
+    backwards(MOTOR_SPEED / 1.5);
     delay(DURATION_DELIVERY);
     stop();
     close_servo();
-    if (Return == true) {
-        rotate_right(MOTOR_SPEED/1.5);
-        delay(DURATION_90_DEG*0.8);
+    if (Return == true)
+    {
+        rotate_right(MOTOR_SPEED / 1.5);
+        delay(DURATION_90_DEG * 0.8);
         updateLineSensors();
-        while (LineSensor2 == LOW){
+        while (LineSensor2 == LOW)
+        {
             updateLineSensors();
-            rotate_right(MOTOR_SPEED/2);
+            rotate_right(MOTOR_SPEED / 2);
         }
     }
-    else {
-        rotate_left(MOTOR_SPEED/1.5);
-        delay(DURATION_90_DEG*0.8);
+    else
+    {
+        rotate_left(MOTOR_SPEED / 1.5);
+        delay(DURATION_90_DEG * 0.8);
         updateLineSensors();
-        while (LineSensor1 == LOW){
+        while (LineSensor1 == LOW)
+        {
             updateLineSensors();
-            rotate_left(MOTOR_SPEED/1.5);
+            rotate_left(MOTOR_SPEED / 1.5);
         }
         stop();
         open_servo();
@@ -580,64 +590,69 @@ void close_servo()
 
 /**
  * Searches the end box by rotating between the extremes and measuring distance
- * with the IR sensor. The unfiltered IR sensor counterintuitively shows a spike 
- * when passing over the blocks so set the stop condition as the sum of three 
+ * with the IR sensor. The unfiltered IR sensor counterintuitively shows a spike
+ * when passing over the blocks so set the stop condition as the sum of three
  * consecutive readings exceeding 150. Collects the block and returns to line.
  */
 
-void search(){
+void search()
+{
     bool angle_found = false;
     int stepdelay = 300;
     int n = 0;
-    unsigned long timer1;  // safeguard to prevent infinite rotation
+    unsigned long timer1; // safeguard to prevent infinite rotation
     backwards(MOTOR_SPEED);
     delay(1200);
     stop();
 
-    //moves it to start pos
+    // moves it to start pos
     rotate_left(MOTOR_SPEED / 1.3);
-    delay(DURATION_90_DEG/3);
+    delay(DURATION_90_DEG / 3);
 
     prev_distance = 0;
     prev_distance2 = 0;
 
-    timer1 = millis();  // begin timer
-    while (angle_found  == false) {
-        bool found = false;     
+    timer1 = millis(); // begin timer
+    while (angle_found == false)
+    {
+        bool found = false;
         rotate_right(MOTOR_SPEED / 2.3);
-        delay(DURATION_90_DEG/17);
+        delay(DURATION_90_DEG / 17);
         distance_cm = mySensor.distance();
-        
+
         // break out of search if timer exceeds 5 seconds
-        if (millis() - timer1 > 5000) {
-          break;
+        if (millis() - timer1 > 5000)
+        {
+            break;
         }
 
         // collect trigger condition
-        if (distance_cm + prev_distance + prev_distance2 > 150) {
+        if (distance_cm + prev_distance + prev_distance2 > 150)
+        {
             // delay needed for first half of search
-            if ((millis() - timer1) < 2500) {
-              delay(150);
+            if ((millis() - timer1) < 2500)
+            {
+                delay(150);
             }
             angle_found = true;
             int steps_to_travel = distance_cm;
-            forwards(MOTOR_SPEED/1.5);
+            forwards(MOTOR_SPEED / 1.5);
             delay(7000);
             stop();
             close_servo();
-            backwards(MOTOR_SPEED/1.5);
+            backwards(MOTOR_SPEED / 1.5);
             delay(3500);
             stop();
-            }
+        }
 
         // update distance readings
         prev_distance2 = prev_distance;
-        prev_distance = distance_cm;            
-        }
-    
+        prev_distance = distance_cm;
+    }
+
     // rotate
     rotate180();
-    }
+}
 
 /******************** INDICATOR LEDS *********************/
 
@@ -651,62 +666,74 @@ void motionLED()
 /******************************** IDENTIFICATION ************************************/
 
 /**
- * Handles block identification by depositing a block, moving backwards and testing for  
- * an ultrasonic signature. If picked up by the ultrasonic sensor, stop moving back, collect 
+ * Handles block identification by depositing a block, moving backwards and testing for
+ * an ultrasonic signature. If picked up by the ultrasonic sensor, stop moving back, collect
  * block and set Coarse to true. Case for journey 1 starts by rotating 90 degrees to avoid
  * detecting the second block. Identification for the second and third passes happens at
  * the second junction on the return journey.
  */
 
-void identifyBlock() {
-    if (journeyCounter == journey1) {
-        rotate_right(MOTOR_SPEED/1.3);
+void identifyBlock()
+{
+    if (journeyCounter == journey1)
+    {
+        rotate_right(MOTOR_SPEED / 1.3);
         delay(DURATION_90_DEG);
         stop();
         open_servo();
         unsigned long t1 = millis();
         unsigned long duration1;
-        backwards(MOTOR_SPEED/2);
-        while(millis() - t1 < 2500) {
+        backwards(MOTOR_SPEED / 2);
+        while (millis() - t1 < 2500)
+        {
             getDistanceUS();
             duration1 = millis() - t1;
-            if (distance_US <= 30) {
+            if (distance_US <= 30)
+            {
                 Coarse = true;
                 break;
             }
         }
-        forwards(MOTOR_SPEED/2);
+        forwards(MOTOR_SPEED / 2);
         delay(duration1 + 250);
         stop();
         close_servo();
-        if (Coarse == true){
+        if (Coarse == true)
+        {
             digitalWrite(coarseLEDpin, HIGH);
         }
-        else {
+        else
+        {
             digitalWrite(fineLEDpin, HIGH);
         }
         rotate180();
-
     }
-    else {
-        unsigned long t1 = millis();;
-        backwards(MOTOR_SPEED/2);
-        while(millis() - t1 < 2500) {
+    else
+    {
+        unsigned long t1 = millis();
+        ;
+        backwards(MOTOR_SPEED / 2);
+        while (millis() - t1 < 2500)
+        {
             getDistanceUS();
-            if (distance_US <= 30) {
+            if (distance_US <= 30)
+            {
                 Coarse = true;
                 break;
             }
         }
-        while(AtJunction == false) {
+        while (AtJunction == false)
+        {
             updateLineSensors();
             line_follow_until_junction();
         }
         AtJunction = false;
-        if (Coarse == true){
+        if (Coarse == true)
+        {
             digitalWrite(coarseLEDpin, HIGH);
         }
-        else {
+        else
+        {
             digitalWrite(fineLEDpin, HIGH);
         }
         stop();
@@ -714,12 +741,13 @@ void identifyBlock() {
 }
 
 /**
- * Pings the ultrasonic sensor and measures the distance, storing it in the 
+ * Pings the ultrasonic sensor and measures the distance, storing it in the
  * global variable distance_US
  */
 
-void getDistanceUS() {
-    
+void getDistanceUS()
+{
+
     // Clears the trigPin condition
     digitalWrite(trigPin, LOW);
     delayMicroseconds(2);

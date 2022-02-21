@@ -2,6 +2,11 @@
 
 Software files for "The Thing".
 Please see [final_competition](https://gitlab.com/t7191/software/-/blob/main/Main%20Programs/final_competition.ino) for our most up to date program.
+
+![The Thing](/Assets/Images/CADRender.jpg "The Thing")
+
+## System Diagram
+![System Diagram](/Assets/Images/SystemDiagram.png "System Diagram")
 ## Files
 
 ### Component Tests
@@ -63,4 +68,10 @@ Finalised code used for competitions.
 - [x] Write third pass search, store, fetch algorithm
 - [x] Implement search into program and test
 - [x] Write block identification code
-- [x] Finalise main program and implement thorough testing
+
+
+## Function Flowchart
+![Flowchart1](/Assets/Images/Flowchart1.png "Flowchart1")
+
+## Function Flowchart
+![Flowchart2](/Assets/Images/Flowchart2.png "Flowchart2")

@@ -251,6 +251,7 @@ void stop()
     motor2->run(RELEASE);
     digitalWrite(motionLEDpin, LOW);
 }
+
 /******************************** 180 TURN ********************************/
 
 /**
@@ -281,6 +282,7 @@ void rotate180()
         }
     }
 }
+
 /******************************** LINE FOLLOWING ALGORITHM ********************************/
 
 /**
@@ -578,6 +580,7 @@ void blue_box()
     }
     stop();
 }
+
 /************************ COLLECTION ***************************/
 
 // Collection for journey 2

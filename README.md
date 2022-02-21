@@ -44,7 +44,7 @@ Finalised code used for competitions.
 - **final_competition_refactored** - finalised final competition program
 
 
-## To do
+## Checklist
 
 - [x] Test motors, servos, line sensors
 - [x] Motion commands with serial control

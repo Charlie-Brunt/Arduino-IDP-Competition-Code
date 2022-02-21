@@ -1,4 +1,4 @@
-# Group 105 "The Think Makers" IDP Software
+# Group 105 "The Thing Makers" IDP Software
 
 Software files for "The Thing".
 Please see [final_competition](https://gitlab.com/t7191/software/-/blob/main/Main%20Programs/final_competition.ino) for our most up to date program.

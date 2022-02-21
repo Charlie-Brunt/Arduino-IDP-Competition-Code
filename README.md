@@ -71,7 +71,7 @@ Finalised code used for competitions.
 
 
 ## Function Flowchart
-![Flowchart1](/Assets/Images/Flowchart1.png "Flowchart1")
+![Flowchart1](/Assets/Images/Flowchart2.png "Flowchart1")
 
-## Function Flowchart
-![Flowchart2](/Assets/Images/Flowchart2.png "Flowchart2")
+## journeyLogic() Flowchart
+![Flowchart2](/Assets/Images/Flowchart1.png "Flowchart2")

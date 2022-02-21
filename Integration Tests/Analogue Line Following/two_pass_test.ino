@@ -15,7 +15,7 @@
 #define pushButtonPin 7
 #define motionLEDpin 13
 #define IRPin A2
-#define model 1080
+#define model 1080  // IR sensor model
 #define IRindicator 5
 
 // Motor setup
@@ -128,9 +128,11 @@ void loop()
     if (loopState == LOOP_STATE_STARTED)
     {
         /************************ MAIN PROGRAM STARTS HERE ************************/
+        // update sensors
         updateLineSensors(IRthreshold);
         distance_cm = mySensor.distance();
         
+        // Rotation, delivery and line following are exclusive events:        
         if (IfRotate == true)
         {
             rotate180();
@@ -159,6 +161,10 @@ void loop()
 
     }
 }
+
+/************************** MOVEMENT *****************************/
+
+// Basic motion functions.
 
 void forwards(int speed)
 {
@@ -240,7 +246,15 @@ void stop()
     motor2->run(RELEASE);
     digitalWrite(motionLEDpin, LOW);
 }
+
 /******************************** 180 TURN ********************************/
+
+/**
+ * Rotate clockwise until the line is detected again.
+ * Use boolean Offline to ensure it will not detect the line at the very 
+ * beginning of rotation.
+ */
+
 void rotate180()
 {
     if (IsOffLine == false)
@@ -263,7 +277,14 @@ void rotate180()
         }
     }
 }
+
 /******************************** LINE FOLLOWING ALGORITHM ********************************/
+
+/**
+ * Line following function used in the main loop.
+ * Calls journeyLogic() every time a junction is reached in order to do certain tasks.
+ */
+
 void line_follow()
 {
     if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
@@ -286,6 +307,12 @@ void line_follow()
 
 /*********************** JOURNEY LOGIC ***********************/
 
+/**
+ * Handles actions performed at each junction for different journeys.
+ * Called in line_follow() every time a junction is reached and
+ * junction incremented each time.
+ */
+
 void journeyLogic()
 {
     switch (journeyCounter)
@@ -293,25 +320,27 @@ void journeyLogic()
     case journey1:
         switch (junctionCounter)
         {
-        case startJunction:
+        case startJunction:  // Pass start junction
             Serial.println("startjunction");
             forwards(motorSpeed);
             junctionCounter++;
             delay(1200);
             break;
-        case junction1:
+        case junction1:  // Pass junction 1
             Serial.println("junction1");
             forwards(motorSpeed);
             junctionCounter = junction2;
             delay(1200);
             break;
-        case junction2:
+        case junction2:  // collect block
           Serial.println("junction2");
             stop();
+            backwards(motorSpeed/2);
+            delay(500);
             DistanceSensor = true;
             junctionCounter = deliverJunction;
             break;
-        case deliverJunction:
+        case deliverJunction:  // deliver block
             stop();
             Ifdeliver = true;
             junctionCounter = junction2;
@@ -323,80 +352,49 @@ void journeyLogic()
     case journey2:
         switch (junctionCounter)
         {
-        case junction2:
+        case junction2:  // pass junction 2
             Serial.println("junction2");
             forwards(motorSpeed);
             delay(500);
-            DistanceSensor = true;
             junctionCounter = junction3;
             break;
-        case junction3:
+        case junction3:  // collect block
             Serial.println("junction2");
             stop();
-            backwards(motorSpeed);
-            delay(600);
-            stop();
-            IfRotate = true;
+            DistanceSensor = true;
             junctionCounter = junction2return;
             break;
-        case junction2return:
+        case junction2return:  // pass junction 2 on return journey
             Serial.println("junction2return");
             forwards(motorSpeed);
             delay(1000);
             junctionCounter = deliverJunction;
             break;
-        case deliverJunction:
+        case deliverJunction:  // deliver block and return to start
             stop();
             Return = true;
             Ifdeliver = true;
             junctionCounter = startJunction;
             break;
-        case startJunction:
+        case startJunction:  // stop inside start box
             Serial.println("STOP");
             forwards(motorSpeed);
             delay(1650);
             stop();
             close_servo();
-            delay(1000000000);
-        }
-        break;
-
-    case journey3:
-        switch (junctionCounter)
-        {
-        case junction2:
-            forwards(motorSpeed);
-            delay(700);
-            junctionCounter = junction3;
-            break;
-        case junction3:
-            stop();
-            search();
-            junctionCounter = junction2return;
-            IfRotate = true;  // temporary
-            break;
-        case junction2return:
-            forwards(motorSpeed);
-            delay(700);
-            junctionCounter = deliverJunction;
-            break;
-        case deliverJunction:
-            stop();
-            Return = true;
-            Ifdeliver = true;
-            junctionCounter = startJunction;
-            break;
-        case startJunction:
-            forwards(motorSpeed);
-            delay(1000);
-            stop();
-            delay(1000000000);
+            delay(1000000000);  // STOP PROGRAM
         }
         break;
     }
 }
 
 /********************** LINE SENSOR UPDATE STATE ***************************/
+
+/**
+ * Converts binary line sensor data to HIGH or LOW and.
+ * Called to update the line sensor states.
+ */
+
 void updateLineSensors(int threshold = 950)
 {
     // sets left LineSensor1 to high if on tape, else Low
@@ -420,6 +418,11 @@ void updateLineSensors(int threshold = 950)
 }
 
 /************************** DELIVERY ***************************/
+
+/**
+ * Delivers block to red box and returns to start box if Return is true,
+ * otherwise returns to line.
+ */
 
 void red_box()
 {   
@@ -463,6 +466,11 @@ void red_box()
     stop();
 }
 
+/**
+ * Delivers block to blue box and returns to start box if Return is true,
+ * otherwise returns to line.
+ */
+
 void blue_box()
 {
     toggleFineLED();
@@ -504,6 +512,12 @@ void blue_box()
     stop();
 }
 /************************ DETECTION ***************************/
+
+/**
+ * Collect block if IR sensor reads less than 10cm
+ * (later removed in favour of collection at junctions)
+ */
+
 void collectIfInRange()
 {
     if (distance_cm <= 10)
@@ -515,6 +529,8 @@ void collectIfInRange()
         IfRotate = true;
     }
 }
+
+// Collection for journey 1
 
 void collectIfInRange_1() 
 {
@@ -529,30 +545,36 @@ void collectIfInRange_1()
     }
     close_servo();
     DistanceSensor = false;
-    forwards(motorSpeed);
+    forwards(motorSpeed/2);
     delay(500);
     IfRotate = true;
 }
 
+// Collection for journey 2
+
 void collectIfInRange_2()
 {
-    if (distance_cm <= 7)
-    {
-        stop();
-        delay(500);
-        Serial.println("collect2");
-        if (IfCoarse == true) {
+    stop();
+    delay(500);
+    Serial.println("collect1");
+    if (IfCoarse == true) {
         toggleCoarseLED();
     } 
     else {
         toggleFineLED();
     }
-        close_servo();
-        DistanceSensor = false;
-    }
+    close_servo();
+    DistanceSensor = false;
+    backwards(motorSpeed);
+    delay(600);
+    stop();
+    IfRotate = true;
 }
 
 /*************************** SERVO ********************************/
+
+// Function to open grabber with servo
+
 void open_servo()
 {
     for (pos = servo_startangle; pos <= servo_endangle; pos += 1)
@@ -561,6 +583,9 @@ void open_servo()
         delay(15);
     }
 }
+
+// Function to close grabber with servo
+
 void close_servo()
 {
     for (pos = servo_endangle; pos >= servo_startangle; pos -= 1)
@@ -570,21 +595,23 @@ void close_servo()
     }
 }
 
-/************************* SEARCH FUNCTION ***********************************/
-void search()
-{
-}
-
 /******************** INDICATOR LEDS *********************/
+
+// Toggles the state of the red LED to indicate a coarse block (later removed)
+
 void toggleCoarseLED()
 {
     digitalWrite(coarseLEDpin, !digitalRead(coarseLEDpin));
 }
 
+// Toggles the state of the green LED to indicate a fine block (late removed)
+
 void toggleFineLED()
 {
     digitalWrite(fineLEDpin, !digitalRead(fineLEDpin));
 }
+
+// Sets the output to the 555 astable to HIGH for a 2Hz flashing LED
 
 void motionLED()
 {

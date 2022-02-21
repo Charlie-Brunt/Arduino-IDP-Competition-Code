@@ -119,6 +119,7 @@ void loop()
     
 }
 
+/************************** MOVEMENT *****************************/
 void forwards(int speed)
 {
     motor1->setSpeed(speed);
@@ -192,6 +193,7 @@ void stop()
     digitalWrite(motionLEDpin, LOW);
 
 }
+
 /******************************** 180 TURN ********************************/
 void rotate180()
 {
@@ -215,6 +217,7 @@ void rotate180()
         }
     }
 }
+
 /******************************** LINE FOLLOWING ALGORITHM ********************************/
 void line_follow()
 {
@@ -257,6 +260,7 @@ void line_follow()
         }
     }
 }
+
 /********************** LINE SENSOR UPDATE STATE ***************************/
 void updateLineSensors(int threshold = 850) {
     //sets left LineSensor1 to high if on tape, else Low
@@ -279,6 +283,7 @@ void updateLineSensors(int threshold = 850) {
     }    
 }
 
+/************************** DELIVERY ***************************/
 void red_box()
 {
     forwards(motorSpeed / 1.5);

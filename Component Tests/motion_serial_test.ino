@@ -37,7 +37,6 @@ void setup() {
 
 void loop() {
   
-  
     if(Serial.available()) {
       input = Serial.readStringUntil('\n');
       Serial.println(input);
@@ -73,6 +72,8 @@ void loop() {
      
     }
 }
+
+/************************** MOTION FUNCTIONS *****************************/
 
 void forwards(int speed) {
     motor1 -> setSpeed(speed);

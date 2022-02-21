@@ -93,7 +93,6 @@ void setup()
     long previousMillis = millis();
 }
 
-/******************************** LOOP ********************************/
 void loop()
 {
     // Push button start/stop
@@ -110,12 +109,12 @@ void loop()
     if (loopState == LOOP_STATE_STARTED)
     {
         /************************ MAIN PROGRAM STARTS HERE ************************/
-        
         search();
         delay(10000000);
     }
 
 }
+
 /******************************** MOVEMENT FUNCTIONS ********************************/
 void forwards(int speed)
 {
@@ -262,9 +261,6 @@ void close_servo(){
     delay(15);
   }
 }
-
-/************************* SEARCH FUNCTION ***********************************/
-
 
 /********************** LINE SENSOR UPDATE STATE ***************************/
 void updateLineSensors(int threshold = 850) {

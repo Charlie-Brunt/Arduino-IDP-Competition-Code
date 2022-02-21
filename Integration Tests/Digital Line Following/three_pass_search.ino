@@ -161,6 +161,10 @@ void loop()
     }
 }
 
+/************************** MOVEMENT *****************************/
+
+// Basic motion functions.
+
 void forwards(int speed)
 {
     motor1->setSpeed(speed);
@@ -242,6 +246,13 @@ void stop()
     digitalWrite(motionLEDpin, LOW);
 }
 /******************************** 180 TURN ********************************/
+
+/**
+ * Rotate clockwise until the line is detected again.
+ * Use boolean Offline to ensure it will not detect the line at the very 
+ * beginning of rotation.
+ */
+
 void rotate180()
 {
     if (IsOffLine == false)
@@ -265,6 +276,12 @@ void rotate180()
     }
 }
 /******************************** LINE FOLLOWING ALGORITHM ********************************/
+
+/**
+ * Line following function used in the main loop.
+ * Calls journeyLogic() every time a junction is reached in order to do certain tasks.
+ */
+
 void line_follow()
 {
     if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
@@ -286,6 +303,12 @@ void line_follow()
 }
 
 /*********************** JOURNEY LOGIC ***********************/
+
+/**
+ * Handles actions performed at each junction for different journeys.
+ * Called in line_follow() every time a junction is reached and
+ * junction incremented each time.
+ */
 
 void journeyLogic()
 {
@@ -382,6 +405,12 @@ void journeyLogic()
 }
 
 /********************** LINE SENSOR UPDATE STATE ***************************/
+
+/**
+ * Converts binary line sensor data to HIGH or LOW and.
+ * Called to update the line sensor states.
+ */
+
 void updateLineSensors()
 {
     // sets left LineSensor1 to high if on tape, else Low
@@ -405,6 +434,11 @@ void updateLineSensors()
 }
 
 /************************** DELIVERY ***************************/
+
+/**
+ * Delivers block to red box and returns to start box if Return is true,
+ * otherwise returns to line.
+ */
 
 void red_box()
 {   
@@ -450,6 +484,11 @@ void red_box()
     stop();
 }
 
+/**
+ * Delivers block to blue box and returns to start box if Return is true,
+ * otherwise returns to line.
+ */
+
 void blue_box()
 {
     forwards(motorSpeed /1.5);
@@ -492,7 +531,9 @@ void blue_box()
     }
     stop();
 }
+
 /************************ DETECTION ***************************/
+
 void collectIfInRange()
 {
     stop();
@@ -542,17 +583,23 @@ void collectIfInRange_2()
 }
 
 /*************************** SERVO ********************************/
+
+// Function to open grabber with servo
+
 void open_servo()
 {
-    for (pos = servo_startangle; pos <= servo_endangle; pos += 1)
+    for (pos = SERVO_START_ANGLE; pos <= SERVO_END_ANGLE; pos += 1)
     {
         myservo.write(pos);
         delay(15);
     }
 }
+
+// Function to close ggrabber with servo
+
 void close_servo()
 {
-    for (pos = servo_endangle; pos >= servo_startangle; pos -= 1)
+    for (pos = SERVO_END_ANGLE; pos >= SERVO_START_ANGLE; pos -= 1)
     {
         myservo.write(pos);
         delay(15);
@@ -560,6 +607,9 @@ void close_servo()
 }
 
 /************************* SEARCH FUNCTION ***********************************/
+
+// Search algorithm first version
+
 void search(){
     bool IfFinding = true;
     bool angle_found = false;
@@ -632,15 +682,22 @@ void search(){
     }
     
 /******************** INDICATOR LEDS *********************/
+
+// Toggles the state of the red LED to indicate a coarse block (later removed)
+
 void toggleCoarseLED()
 {
     digitalWrite(coarseLEDpin, !digitalRead(coarseLEDpin));
 }
 
+// Toggles the state of the green LED to indicate a fine block (late removed)
+
 void toggleFineLED()
 {
     digitalWrite(fineLEDpin, !digitalRead(fineLEDpin));
 }
+
+// Sets the output to the 555 astable to HIGH for a 2Hz flashing LED
 
 void motionLED()
 {

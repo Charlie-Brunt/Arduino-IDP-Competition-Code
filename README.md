@@ -1,19 +1,16 @@
-# Group 105 IDP Software
+# Group 105 "The Think Makers" IDP Software
 
-
-By Amanda Ge and Charlie Brunt
-
-Arduino Uno Wifi Rev 2 code for "The Thing" including test programs for testing motors, servos, movement commands, line following and block detection.
+Software files for "The Thing".
+Please see "Main Programs" for first and final competition programs.
 ## Files
 
 ### Component Tests
 Basic component programs to test motors, sensors and servos.
-- **deliver_test** - intitial program for deliver block calibration
+- **analogue_LF_sensor_test** - calibration of analogue line follower sensors
+- **digital_LF_sensor_test** - prints state of line follower sensor to calibrate against table
 - **IR_sensor_test** - serial write distance readings from IR sensor
-- **LF_sensor_test** - calibration of analogue line follower sensors
-- **LF_test_analogue** - test for analogue line following
+- **motion_functions** - all motion functions
 - **motion_serial_test** - send serial commands to control motion
-- **motion_test** - all motion functions
 - **motor_test** - basic motor testing
 - **servo_test** - test servo actuation
 - **ultrasonic_test** - test ultrasonic sensor
@@ -22,18 +19,19 @@ Basic component programs to test motors, sensors and servos.
 
 #### Analogue Line Following
 Tests leading up to the first competition with line following using analogue pins and thresholds.
+- **LF_test_analogue** - test for analogue line following
 - **collect_block_test_1** - program to test millis() timing over ramp, servo actuation, return and delivery 
 - **collect_block_test_2** - program to test robot pushing the block before grabbing it
 - **collect_block_test_3** - program to test grabbers pushing the block before grabbing it
+- **deliver_test** - intitial program for deliver block calibration
 - **find_block** - initial attempt at end box search algorithm
-- **first_pass_test** - first pass line follow, rotate, deliver test protocol (complete)
+- **first_pass_test** - first pass line follow, rotate, deliver test protocol
 - **rotate_180_test** - test line follow and 180 degree rotations at junctions
 - **two_pass_test** - first competition program
 
 
 #### Digital Line Following
 Post-first-competition tests with improved digital line following.
-- **digital_LF_sensor_test** - prints state of line follower sensor to calibrate against table
 - **digital_LF_test** - tests digital line following algorithm
 - **three_pass_search** - three passes with search
 - **three_pass_ultrasonic** - three passes with search and identification

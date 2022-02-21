@@ -160,11 +160,10 @@ void loop()
             }
             else if (journeyCounter = journey2) {
                 collectIfInRange_2();
-            }
-        }
 
-    }
-}
+/************************** MOVEMENT *****************************/
+
+// Basic motion functions.
 
 void forwards(int speed)
 {
@@ -247,6 +246,13 @@ void stop()
     digitalWrite(motionLEDpin, LOW);
 }
 /******************************** 180 TURN ********************************/
+
+/**
+ * Rotate clockwise until the line is detected again.
+ * Use boolean Offline to ensure it will not detect the line at the very 
+ * beginning of rotation.
+ */
+
 void rotate180()
 {
     if (IsOffLine == false)
@@ -270,6 +276,12 @@ void rotate180()
     }
 }
 /******************************** LINE FOLLOWING ALGORITHMS ********************************/
+
+/**
+ * Line following function used in the main loop.
+ * Calls journeyLogic() every time a junction is reached in order to do certain tasks.
+ */
+
 void line_follow()
 {
     if ((LineSensor1 == LOW) && (LineSensor2 == LOW))
@@ -289,6 +301,11 @@ void line_follow()
         journeyLogic();
     }
 }
+
+/**
+ * line following function used when identifying blocks outside the main loop.
+ * Stop when junction reached, then back to the main journey logic.
+ */
 
 void line_follow_until_junction()
 {
@@ -312,6 +329,12 @@ void line_follow_until_junction()
 }
 
 /*********************** JOURNEY LOGIC ***********************/
+
+/**
+ * Handles actions performed at each junction for different journeys.
+ * Called in line_follow() every time a junction is reached and
+ * junction incremented each time.
+ */
 
 void journeyLogic()
 {
@@ -421,6 +444,12 @@ void journeyLogic()
 }
 
 /********************** LINE SENSOR UPDATE STATE ***************************/
+
+/**
+ * Converts binary line sensor data to HIGH or LOW and.
+ * Called to update the line sensor states.
+ */
+
 void updateLineSensors()
 {
     // sets left LineSensor1 to high if on tape, else Low
@@ -444,6 +473,11 @@ void updateLineSensors()
 }
 
 /************************** DELIVERY ***************************/
+
+/**
+ * Delivers block to red box and returns to start box if Return is true,
+ * otherwise returns to line.
+ */
 
 void red_box()
 {   
@@ -490,6 +524,11 @@ void red_box()
     stop();
 }
 
+/**
+ * Delivers block to blue box and returns to start box if Return is true,
+ * otherwise returns to line.
+ */
+
 void blue_box()
 {
     forwards(motorSpeed /1.5);
@@ -533,6 +572,7 @@ void blue_box()
     stop();
 }
 /************************ DETECTION ***************************/
+
 void collectIfInRange()
 {
     if (distance_IR <= 10)
@@ -581,6 +621,9 @@ void collectIfInRange_2()
 }
 
 /*************************** SERVO ********************************/
+
+// Function to open grabber with servo
+
 void open_servo()
 {
     for (pos = servo_startangle; pos <= servo_endangle; pos += 1)
@@ -589,6 +632,9 @@ void open_servo()
         delay(15);
     }
 }
+
+// Function to close ggrabber with servo
+
 void close_servo()
 {
     for (pos = servo_endangle; pos >= servo_startangle; pos -= 1)
@@ -599,20 +645,30 @@ void close_servo()
 }
 
 /************************* SEARCH FUNCTION ***********************************/
+
+// Placeholder search function
+
 void search()
 {
 }
 
 /******************** INDICATOR LEDS *********************/
+
+// Toggles the state of the red LED to indicate a coarse block (later removed)
+
 void toggleCoarseLED()
 {
     digitalWrite(coarseLEDpin, !digitalRead(coarseLEDpin));
 }
 
+// Toggles the state of the green LED to indicate a fine block (late removed)
+
 void toggleFineLED()
 {
     digitalWrite(fineLEDpin, !digitalRead(fineLEDpin));
 }
+
+// Sets the output to the 555 astable to HIGH for a 2Hz flashing LED
 
 void motionLED()
 {
@@ -620,6 +676,11 @@ void motionLED()
 }
 
 /******************************** IDENTIFICATION ROUTINE ************************************/
+
+/**
+ * First attempt at indentification using the ultrasonic sensor.
+ */
+
 void identifyBlock() {
     unsigned long t1 = millis();;
     backwards(motorSpeed/2);
@@ -637,6 +698,11 @@ void identifyBlock() {
     Meetjunction = false;                
     stop();
 }
+
+/**
+ * Pings the ultrasonic sensor and measures the distance, storing it in the 
+ * global variable distance_US
+ */
 
 void getDistanceUS() {
     

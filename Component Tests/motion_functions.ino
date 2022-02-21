@@ -12,6 +12,9 @@ void setup() {
 void loop() {
   
 }
+
+/************************** MOVEMENT *****************************/
+
 void forwards(int speed)
 {
     motor1->setSpeed(speed);

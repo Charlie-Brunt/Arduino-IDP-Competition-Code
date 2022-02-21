@@ -83,7 +83,6 @@ void turn_left_backwards();
 void rotate_left();
 void rotate_right();
 void updateLineSensors();
-void collectIfInRange();
 void close_servo();
 void open_servo();
 void journeyLogic();
@@ -91,8 +90,6 @@ void search();
 void motionLED();
 void blue_box();
 void red_box();
-void collectIfInRange_1();
-void collect_2();
 void identifyBlock();
 void getDistanceUS();
 void line_follow_until_junction();
@@ -352,7 +349,12 @@ void journeyLogic()
             break;
         case junction3:  // collect block and rotate
             stop();
-            collect_2();
+            delay(500);
+            close_servo();
+            backwards(MOTOR_SPEED);
+            delay(600);
+            stop();
+            rotate180();
             junctionCounter = junction2return;
             break;
         case junction2return:  // stop and identify block
@@ -548,21 +550,6 @@ void blue_box()
         // delay(700);
     }
     stop();
-}
-
-/************************ COLLECTION ***************************/
-
-// Collection for journey 2
-
-void collect_2()
-{
-    stop();
-    delay(500);
-    close_servo();
-    backwards(MOTOR_SPEED);
-    delay(600);
-    stop();
-    rotate180();
 }
 
 /*************************** SERVO ********************************/
